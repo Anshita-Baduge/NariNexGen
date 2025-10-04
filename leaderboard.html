@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NariNexGen - Financial Growth Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1d4ed8 0%, #3678e9 25%, #3b82f6 50%, #60a5fa 75%, #93c5fd 100%);
+      min-height: 100vh;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeInDown 0.8s ease;
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #1e3a8a, #1d4ed8, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: rgb(120, 196, 247);
+      background-clip: text;
+      text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+    }
+
+    .header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      font-weight: 300;
+      color: #e0f2fe;
+      /* Light blue for subtitle text */
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(25px);
+      border-radius: 28px;
+      padding: 35px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(59, 130, 246, 0.1);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #1e3a8a, #1d4ed8, #3b82f6);
+      transform: scaleX(0);
+      transition: transform 0.4s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 30px 60px rgba(59, 130, 246, 0.2);
+    }
+
+    .card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .score-section {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .score-big {
+      font-size: 4.5rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #1e3a8a, #1d4ed8, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: pulse 2s infinite;
+      text-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+    }
+
+    .progress-container {
+      margin-bottom: 30px;
+    }
+
+    .progress {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50px;
+      height: 10px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(135deg, #1e3a8a, #1d4ed8, #3b82f6);
+      border-radius: 50px;
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      animation: shimmer 2s infinite;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .metric {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .metric:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+    }
+
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #60a5fa;
+    }
+
+    .metric-label {
+      font-size: 0.95rem;
+      opacity: 0.8;
+      font-weight: 400;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      padding: 18px 24px;
+      border: none;
+      border-radius: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      color: white;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: white;
+      box-shadow: 0 4px 15px rgba(96, 165, 250, 0.3);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #93c5fd, #60a5fa);
+      color: white;
+      box-shadow: 0 4px 15px rgba(147, 197, 253, 0.3);
+    }
+
+    .btn.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .wellness-score-card {
+      background: linear-gradient(135deg, rgba(41, 116, 236, 0.2), rgba(11, 90, 185, 0.1));
+      border: 2px solid rgba(59, 131, 246, 0.744);
+      margin-bottom: 30px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+
+    .wellness-score-card:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
+      transform: translateY(-5px);
+    }
+
+    .wellness-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .wellness-icon {
+      font-size: 3rem;
+      background: linear-gradient(45deg, #3b82f6, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .wellness-main-score {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: #3b82f6;
+    }
+
+    .wellness-components {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .wellness-component {
+      text-align: center;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+    }
+
+    .component-score {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #60a5fa;
+      margin-bottom: 5px;
+    }
+
+    .component-label {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    .unlock-section {
+      margin-top: 20px;
+    }
+
+    .unlock-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .unlock-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .unlock-card {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 22px;
+      border-radius: 18px;
+      text-align: center;
+      transition: all 0.4s ease;
+      cursor: pointer;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .unlock-card.locked {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .unlock-card.unlocked {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: #3b82f6;
+      box-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
+    }
+
+    .unlock-card.unlocked:hover {
+      transform: translateY(-5px);
+      background: rgba(59, 130, 246, 0.2);
+    }
+
+    .unlock-icon {
+      font-size: 2.2rem;
+      margin-bottom: 12px;
+      display: block;
+      color: #60a5fa;
+    }
+
+    .unlock-title-text {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .unlock-hint {
+      font-size: 0.8rem;
+      opacity: 0.7;
+    }
+
+    .leaderboard {
+      list-style: none;
+    }
+
+    .leaderboard li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 24px;
+      margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .leaderboard li:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(8px);
+      border-left-color: #3b82f6;
+      box-shadow: 0 5px 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .leaderboard li:first-child {
+      background: linear-gradient(90deg, rgba(59, 130, 246, 0.3), rgba(255, 255, 255, 0.1));
+      border-left-color: #3b82f6;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .rank {
+      font-weight: 700;
+      width: 35px;
+      color: #60a5fa;
+    }
+
+    .name {
+      flex: 1;
+      margin-left: 15px;
+      font-weight: 500;
+    }
+
+    .score {
+      font-weight: 700;
+      color: #3b82f6;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      padding: 18px 28px;
+      border-radius: 18px;
+      font-weight: 600;
+      transform: translateX(400px);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+      box-shadow: 0 12px 30px rgba(59, 130, 246, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .notification.show {
+      transform: translateX(0);
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%);
+      }
+
+      100% {
+        transform: translateX(100%);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .unlock-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .wellness-components {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+      }
+
+      .score-big {
+        font-size: 3.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1> NariNexGen</h1>
+      <p>Master your finances, unlock your potential, and build wealth smartly</p>
+    </div>
+
+    <div class="card wellness-score-card" onclick="openWellnessScore()">
+      <div class="wellness-header">
+        <i class="fas fa-heartbeat wellness-icon"></i>
+        <div class="wellness-main-score" id="wellnessMainScore">75</div>
+      </div>
+      <h2>💎 Financial Wellness Score</h2>
+      <p style="opacity: 0.8; margin: 15px 0;">Your comprehensive financial health beyond traditional credit scores</p>
+
+      <div class="wellness-components">
+        <div class="wellness-component">
+          <div class="component-score" id="consistencyDisplay">78</div>
+          <div class="component-label">Consistency</div>
+        </div>
+        <div class="wellness-component">
+          <div class="component-score" id="learningDisplay">85</div>
+          <div class="component-label">Learning</div>
+        </div>
+        <div class="wellness-component">
+          <div class="component-score" id="spendingDisplay">62</div>
+          <div class="component-label">Spending</div>
+        </div>
+      </div>
+
+      <div
+        style="text-align: center; margin-top: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 12px;">
+        <strong>🎯 Click to explore your detailed wellness report</strong>
+      </div>
+    </div>
+
+    <div class="dashboard">
+      <div class="card">
+        <div class="score-section">
+          <div class="score-big" id="scoreValue">0</div>
+          <h2>Trust Score</h2>
+        </div>
+
+        <div class="progress-container">
+          <div class="progress">
+            <div class="progress-bar" id="scoreBar" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-value" id="streakVal">0</div>
+            <div class="metric-label">Day Streak</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="saveRateVal">0%</div>
+            <div class="metric-label">Save Rate</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value" id="quizPtsVal">0</div>
+            <div class="metric-label">Quiz Points</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" onclick="addSavings()">
+            <i class="fas fa-piggy-bank"></i> Save ₹50
+          </button>
+          <button class="btn btn-secondary" onclick="addQuiz()">
+            <i class="fas fa-brain"></i> Quiz +10
+          </button>
+          <button class="btn btn-success" onclick="addStreak()">
+            <i class="fas fa-fire"></i> Daily Win
+          </button>
+        </div>
+
+        <div class="unlock-section">
+          <div class="unlock-title">🎯 Learning Modules</div>
+          <div class="unlock-grid">
+            <div class="unlock-card locked" id="unlock1" onclick="openInvestmentBasics()">
+              <i class="fas fa-chart-line unlock-icon"></i>
+              <div class="unlock-title-text">Investment Basics</div>
+              <div class="unlock-hint">Unlock at 40 points</div>
+            </div>
+            <div class="unlock-card locked" id="unlock2" onclick="openAdvancedFinance()">
+              <i class="fas fa-graduation-cap unlock-icon"></i>
+              <div class="unlock-title-text">Advanced Finance</div>
+              <div class="unlock-hint">Unlock at 70 points</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><i class="fas fa-trophy"></i> Community Leaders</h2>
+        <ul class="leaderboard" id="leaderboard"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="notification" id="notification"></div>
+
+  <script>
+    let score = 0, streak = 0, quizPts = 0, savings = 0;
+
+    let leaderboard = [
+      { name: "You", score: 0 },
+      { name: "Aarav K.", score: 85 },
+      { name: "Meera S.", score: 92 },
+      { name: "Riya P.", score: 78 },
+      { name: "Kabir M.", score: 88 }
+    ];
+
+    function showNotification(message) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.classList.add('show');
+
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    function updateUI() {
+      document.getElementById("scoreValue").textContent = score;
+      document.getElementById("scoreBar").style.width = Math.min(100, score) + "%";
+      document.getElementById("streakVal").textContent = streak;
+      document.getElementById("saveRateVal").textContent = Math.min(100, (savings / 5000) * 100).toFixed(0) + "%";
+      document.getElementById("quizPtsVal").textContent = quizPts;
+
+      // Update unlock status
+      const unlock1 = document.getElementById("unlock1");
+      const unlock2 = document.getElementById("unlock2");
+
+      if (score >= 40) {
+        unlock1.classList.remove("locked");
+        unlock1.classList.add("unlocked");
+        unlock1.querySelector('.unlock-hint').textContent = "Click to explore!";
+      }
+
+      if (score >= 70) {
+        unlock2.classList.remove("locked");
+        unlock2.classList.add("unlocked");
+        unlock2.querySelector('.unlock-hint').textContent = "Click to explore!";
+      }
+
+      // Update leaderboard
+      leaderboard[0].score = score;
+      leaderboard.sort((a, b) => b.score - a.score);
+
+      const leaderboardHTML = leaderboard
+        .map((p, i) => `
+          <li ${p.name === 'You' ? 'style="background: linear-gradient(90deg, rgba(59, 130, 246, 0.3), rgba(255, 255, 255, 0.1));"' : ''}>
+            <span class="rank">${i + 1}</span>
+            <span class="name">${p.name}</span>
+            <span class="score">${p.score}</span>
+          </li>
+        `).join("");
+
+      document.getElementById("leaderboard").innerHTML = leaderboardHTML;
+
+      // Update financial wellness components based on activities
+      updateWellnessScore();
+    }
+
+    function updateWellnessScore() {
+      // Calculate wellness components based on user activities
+      const consistency = Math.min(100, 50 + (streak * 5) + (savings / 100));
+      const learning = Math.min(100, 40 + (quizPts * 2));
+      const spending = Math.min(100, 30 + ((savings / 1000) * 20));
+
+      const overallWellness = Math.round((consistency * 0.4) + (learning * 0.3) + (spending * 0.3));
+
+      document.getElementById('wellnessMainScore').textContent = overallWellness;
+      document.getElementById('consistencyDisplay').textContent = Math.round(consistency);
+      document.getElementById('learningDisplay').textContent = Math.round(learning);
+      document.getElementById('spendingDisplay').textContent = Math.round(spending);
+    }
+
+    function addSavings() {
+      const oldScore = score;
+      score = Math.min(100, score + 5);
+      savings += 50;
+
+      if (score !== oldScore) {
+        showNotification("🎉 Great job saving! +5 points earned");
+      }
+
+      updateUI();
+    }
+
+    function addQuiz() {
+      const oldScore = score;
+      score = Math.min(100, score + 8);
+      quizPts += 10;
+
+      if (score !== oldScore) {
+        showNotification("🧠 Knowledge gained! +8 points earned");
+      }
+
+      updateUI();
+    }
+
+    function addStreak() {
+      const oldScore = score;
+      score = Math.min(100, score + 6);
+      streak += 1;
+
+      if (score !== oldScore) {
+        showNotification("🔥 Streak maintained! +6 points earned");
+      }
+
+      updateUI();
+    }
+
+    function openInvestmentBasics() {
+      if (score >= 40) {
+        window.location.href = 'investment-basics.html';
+      } else {
+        showNotification("🔒 Need " + (40 - score) + " more points to unlock!");
+      }
+    }
+
+    function openAdvancedFinance() {
+      if (score >= 70) {
+        window.location.href = 'advanced-finance.html';
+      } else {
+        showNotification("🔒 Need " + (70 - score) + " more points to unlock!");
+      }
+    }
+
+    function openWellnessScore() {
+      window.location.href = 'financial-wellness-score.html';
+    }
+
+    // Initialize
+    updateUI();
+
+    // Add some initial animation
+    setTimeout(() => {
+      document.querySelectorAll('.card').forEach((card, index) => {
+        card.style.animation = fadeInDown 0.6s ease ${index * 0.2}s both;
+      });
+    }, 100);
+  </script>
+</body>
+
+</html>
