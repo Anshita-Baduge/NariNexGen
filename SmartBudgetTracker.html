@@ -1,1 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Budget Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 25%, #8b5cf6 75%, #ec4899 100%);
+        }
+        .step-indicator {
+            transition: all 0.3s ease;
+        }
+        .step-active {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .notification.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+        }
+        .notification.warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark-card {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+        .priority-item {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border: 2px solid #60a5fa;
+            color: white;
+            cursor: grab;
+        }
+        .priority-item:active {
+            cursor: grabbing;
+        }
+        .priority-item:hover {
+            border-color: #ec4899;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+        }
+        .priority-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+    
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">Smart Budget Tracker</h1>
+            <p class="text-blue-100">Plan, track, and manage your monthly finances intelligently</p>
+        </div>
+
+        <!-- Progress Indicator -->
+        <div class="flex justify-center mb-8">
+            <div class="flex space-x-4">
+                <div id="step1-indicator" class="step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-white font-bold cursor-pointer" onclick="goToStep(1)">1</div>
+                <div id="step2-indicator" class="step-indicator bg-white bg-opacity-30 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold cursor-pointer" onclick="goToStep(2)">2</div>
+                <div id="step3-indicator" class="step-indicator bg-white bg-opacity-30 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold cursor-pointer" onclick="goToStep(3)">3</div>
+                <div id="step4-indicator" class="step-indicator bg-white bg-opacity-30 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold cursor-pointer" onclick="goToStep(4)">4</div>
+                <div id="step5-indicator" class="step-indicator bg-white bg-opacity-30 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold cursor-pointer" onclick="goToStep(5)">5</div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between mb-6">
+            <button id="backBtn" onclick="goBack()" class="hidden bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg">← Back</button>
+            <div></div>
+        </div>
+
+        <!-- Step 1: Month Selection & Income -->
+        <div id="step1" class="glass-card rounded-xl shadow-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold text-white mb-6">Select Month & Enter Income</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-blue-100 mb-2">Select Month</label>
+                    <select id="monthSelect" class="w-full p-3 bg-white bg-opacity-90 border-2 border-blue-400 text-gray-800 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 font-medium">
+                        <option value="">Choose month...</option>
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-blue-100 mb-2">Monthly Income (₹)</label>
+                    <input type="number" id="incomeInput" placeholder="Enter your total income" class="w-full p-3 bg-white bg-opacity-90 border-2 border-blue-400 text-gray-800 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 placeholder-gray-500 font-medium">
+                </div>
+            </div>
+            <button onclick="goToStep2()" class="mt-6 bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg">Continue to Expenses →</button>
+        </div>
+
+        <!-- Step 2: Expense Categories -->
+        <div id="step2" class="hidden glass-card rounded-xl shadow-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold text-white mb-6">Plan Your Expenses</h2>
+            
+            <!-- Fixed Expenses Selection -->
+            <div class="mb-8">
+                <div class="dark-card border-l-4 border-sky-400 p-6 rounded-lg mb-4">
+                    <h3 class="text-xl font-bold text-sky-300 mb-4">Fixed Expenses</h3>
+                    <p class="text-blue-100 mb-4">Select the categories that apply to you:</p>
+                    
+                    <!-- Category Selection -->
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <label class="flex items-center space-x-3 p-4 bg-white bg-opacity-20 rounded-lg border-2 border-blue-300 hover:border-pink-400 hover:bg-white hover:bg-opacity-30 cursor-pointer transition-all duration-300">
+                            <input type="checkbox" id="rentCategory" class="w-5 h-5 text-pink-500 rounded bg-white border-2 border-blue-400">
+                            <span class="font-semibold text-white">Rent & Utilities</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-4 bg-white bg-opacity-20 rounded-lg border-2 border-blue-300 hover:border-pink-400 hover:bg-white hover:bg-opacity-30 cursor-pointer transition-all duration-300">
+                            <input type="checkbox" id="educationCategory" class="w-5 h-5 text-pink-500 rounded bg-white border-2 border-blue-400">
+                            <span class="font-semibold text-white">Educational Expenses</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-4 bg-white bg-opacity-20 rounded-lg border-2 border-blue-300 hover:border-pink-400 hover:bg-white hover:bg-opacity-30 cursor-pointer transition-all duration-300">
+                            <input type="checkbox" id="mealsCategory" class="w-5 h-5 text-pink-500 rounded bg-white border-2 border-blue-400">
+                            <span class="font-semibold text-white">Fixed Meals</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-4 bg-white bg-opacity-20 rounded-lg border-2 border-blue-300 hover:border-pink-400 hover:bg-white hover:bg-opacity-30 cursor-pointer transition-all duration-300">
+                            <input type="checkbox" id="loansCategory" class="w-5 h-5 text-pink-500 rounded bg-white border-2 border-blue-400">
+                            <span class="font-semibold text-white">Loans & EMIs</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-4 bg-white bg-opacity-20 rounded-lg border-2 border-blue-300 hover:border-pink-400 hover:bg-white hover:bg-opacity-30 cursor-pointer transition-all duration-300">
+                            <input type="checkbox" id="billsCategory" class="w-5 h-5 text-pink-500 rounded bg-white border-2 border-blue-400">
+                            <span class="font-semibold text-white">Pay Bills</span>
+                        </label>
+                        <label class="flex items-center space-x-3 p-4 bg-white bg-opacity-20 rounded-lg border-2 border-blue-300 hover:border-pink-400 hover:bg-white hover:bg-opacity-30 cursor-pointer transition-all duration-300">
+                            <input type="checkbox" id="travelFixedCategory" class="w-5 h-5 text-pink-500 rounded bg-white border-2 border-blue-400">
+                            <span class="font-semibold text-white">Monthly Travel Pass</span>
+                        </label>
+                    </div>
+
+                    <!-- Dynamic Sections -->
+                    <div id="rentSection" class="hidden bg-blue-900 bg-opacity-50 p-4 rounded-lg shadow-lg mb-4 border border-blue-400">
+                        <h4 class="font-semibold text-blue-200 mb-3">Rent & Utilities</h4>
+                        <div class="grid md:grid-cols-2 gap-3">
+                            <input type="number" id="rent" placeholder="Rent/Hostel Fees" class="w-full p-3 bg-white bg-opacity-90 border-2 border-blue-400 text-gray-800 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 placeholder-gray-500 font-medium">
+                            <input type="number" id="utilities" placeholder="Utilities (Total)" class="w-full p-3 bg-white bg-opacity-90 border-2 border-blue-400 text-gray-800 rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 placeholder-gray-500 font-medium">
+                        </div>
+                    </div>
+
+                    <div id="educationSection" class="hidden bg-blue-900 bg-opacity-50 p-4 rounded-lg shadow-lg mb-4 border border-blue-400">
+                        <h4 class="font-semibold text-blue-200 mb-3">Educational Expenses</h4>
+                        <div class="grid md:grid-cols-2 gap-3">
+                            <input type="number" id="education" placeholder="College/Tuition Fees" class="w-full p-3 bg-blue-800 border border-blue-500 text-white rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 placeholder-blue-300">
+                            <input type="number" id="books" placeholder="Books & Materials" class="w-full p-3 bg-blue-800 border border-blue-500 text-white rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 placeholder-blue-300">
+                        </div>
+                    </div>
+
+                    <div id="mealsSection" class="hidden bg-blue-900 bg-opacity-50 p-4 rounded-lg shadow-lg mb-4 border border-blue-400">
+                        <h4 class="font-semibold text-blue-200 mb-3">Fixed Meals</h4>
+                        <input type="number" id="monthlyMeal" placeholder="Monthly Meal Plan Amount" class="w-full p-3 bg-blue-800 border border-blue-500 text-white rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 placeholder-blue-300">
+                    </div>
+
+                    <div id="loansSection" class="hidden bg-blue-900 bg-opacity-50 p-4 rounded-lg shadow-lg mb-4 border border-blue-400">
+                        <h4 class="font-semibold text-blue-200 mb-3">Loans & EMIs</h4>
+                        <div class="grid md:grid-cols-2 gap-3">
+                            <input type="number" id="emis" placeholder="EMIs" class="w-full p-3 bg-blue-800 border border-blue-500 text-white rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 placeholder-blue-300">
+                            <input type="number" id="loans" placeholder="Loans" class="w-full p-3 bg-blue-800 border border-blue-500 text-white rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 placeholder-blue-300">
+                        </div>
+                    </div>
+
+                    <div id="billsSection" class="hidden bg-blue-900 bg-opacity-50 p-4 rounded-lg shadow-lg mb-4 border border-blue-400">
+                        <h4 class="font-semibold text-blue-200 mb-3">Pay Bills</h4>
+                        <div class="grid md:grid-cols-2 gap-3">
+                            <input type="number" id="recharge" placeholder="Mobile Recharge" class="w-full p-3 bg-blue-800 border border-blue-500 text-white rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 placeholder-blue-300">
+                            <input type="number" id="subscriptions" placeholder="Subscriptions" class="w-full p-3 bg-blue-800 border border-blue-500 text-white rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 placeholder-blue-300">
+                        </div>
+                    </div>
+
+                    <div id="travelFixedSection" class="hidden bg-blue-900 bg-opacity-50 p-4 rounded-lg shadow-lg mb-4 border border-blue-400">
+                        <h4 class="font-semibold text-blue-200 mb-3">Monthly Travel Pass</h4>
+                        <input type="number" id="travelFixed" placeholder="Monthly Bus/Metro Pass" class="w-full p-3 bg-blue-800 border border-blue-500 text-white rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400 placeholder-blue-300">
+                    </div>
+
+                    <button onclick="submitFixedExpenses()" class="mt-4 bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg">Submit Fixed Expenses</button>
+                </div>
+            </div>
+
+            <!-- Fixed Expenses Summary (Hidden initially) -->
+            <div id="fixedExpensesSummary" class="hidden mb-8">
+                <div class="glass-card border-l-4 border-sky-400 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold text-blue-900 mb-4">Your Fixed Expenses Summary</h3>
+                    <div id="fixedSummaryContent"></div>
+                    <button onclick="editFixedExpenses()" class="mt-4 bg-violet-600 hover:bg-violet-700 text-white px-4 py-2 rounded-lg text-sm">Edit Fixed Expenses</button>
+                </div>
+            </div>
+
+            <!-- Budget Allocation Section (Hidden initially) -->
+            <div id="budgetAllocationSection" class="hidden mb-8">
+                <div class="glass-card border-l-4 border-violet-400 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold text-violet-300 mb-4">Smart Budget Allocation</h3>
+                    <div id="budgetGuidance" class="mb-6">
+                        <!-- Budget guidance will be populated here -->
+                    </div>
+                    
+                    <button onclick="proceedToPriorities()" class="bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">Set Variable Expense Priorities →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Priority Setting -->
+        <div id="step3" class="hidden glass-card rounded-xl shadow-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold text-white mb-6">Set Variable Expense Priorities & Estimates</h2>
+            
+            <div class="dark-card p-6 rounded-lg mb-6 border border-sky-400">
+                <h3 class="text-lg font-semibold text-sky-300 mb-3">Budget Overview</h3>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div class="bg-blue-900 bg-opacity-50 p-4 rounded-lg">
+                        <div class="text-sm text-blue-200">Total Income</div>
+                        <div class="text-2xl font-bold text-green-400" id="totalIncomeDisplay">₹0</div>
+                    </div>
+                    <div class="bg-blue-900 bg-opacity-50 p-4 rounded-lg">
+                        <div class="text-sm text-blue-200">Fixed Expenses</div>
+                        <div class="text-2xl font-bold text-red-400" id="fixedExpensesDisplay">₹0</div>
+                    </div>
+                </div>
+                <div class="bg-blue-900 bg-opacity-50 p-4 rounded-lg">
+                    <div class="text-sm text-blue-200">Available for Variable Expenses & Savings</div>
+                    <div class="text-3xl font-bold text-blue-400" id="availableAmount">₹0</div>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <p class="text-blue-100 mb-4">Drag to reorder by priority (1 = highest priority), then enter your estimated monthly amounts. Leave empty if not needed:</p>
+                <div id="priorityList" class="space-y-3">
+                    <div class="priority-item p-4 rounded-lg shadow-lg transition-all duration-300" data-category="health" draggable="true">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-medium text-white">Health & Medical</span>
+                            <span class="text-sm text-blue-200">Priority: <span class="priority-number">1</span></span>
+                        </div>
+                        <input type="number" class="priority-budget w-full p-2 bg-blue-800 bg-opacity-70 border border-blue-400 text-white rounded-lg focus:ring-2 focus:ring-pink-400 placeholder-blue-300" placeholder="Enter estimated amount (optional)" onchange="updateRemainingBudget()">
+                    </div>
+                    <div class="priority-item p-4 rounded-lg shadow-lg transition-all duration-300" data-category="food" draggable="true">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-medium text-white">Food & Dining</span>
+                            <span class="text-sm text-blue-200">Priority: <span class="priority-number">2</span></span>
+                        </div>
+                        <input type="number" class="priority-budget w-full p-2 bg-blue-800 bg-opacity-70 border border-blue-400 text-white rounded-lg focus:ring-2 focus:ring-pink-400 placeholder-blue-300" placeholder="Enter estimated amount (optional)" onchange="updateRemainingBudget()">
+                    </div>
+                    <div class="priority-item p-4 rounded-lg shadow-lg transition-all duration-300" data-category="travel" draggable="true">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-medium text-white">Travel & Transport</span>
+                            <span class="text-sm text-blue-200">Priority: <span class="priority-number">3</span></span>
+                        </div>
+                        <input type="number" class="priority-budget w-full p-2 bg-blue-800 bg-opacity-70 border border-blue-400 text-white rounded-lg focus:ring-2 focus:ring-pink-400 placeholder-blue-300" placeholder="Enter estimated amount (optional)" onchange="updateRemainingBudget()">
+                    </div>
+                    <div class="priority-item p-4 rounded-lg shadow-lg transition-all duration-300" data-category="entertainment" draggable="true">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-medium text-white">Entertainment</span>
+                            <span class="text-sm text-blue-200">Priority: <span class="priority-number">4</span></span>
+                        </div>
+                        <input type="number" class="priority-budget w-full p-2 bg-blue-800 bg-opacity-70 border border-blue-400 text-white rounded-lg focus:ring-2 focus:ring-pink-400 placeholder-blue-300" placeholder="Enter estimated amount (optional)" onchange="updateRemainingBudget()">
+                    </div>
+                    <div class="priority-item p-4 rounded-lg shadow-lg transition-all duration-300" data-category="shopping" draggable="true">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-medium text-white">Shopping</span>
+                            <span class="text-sm text-blue-200">Priority: <span class="priority-number">5</span></span>
+                        </div>
+                        <input type="number" class="priority-budget w-full p-2 bg-blue-800 bg-opacity-70 border border-blue-400 text-white rounded-lg focus:ring-2 focus:ring-pink-400 placeholder-blue-300" placeholder="Enter estimated amount (optional)" onchange="updateRemainingBudget()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="dark-card p-6 rounded-lg mb-6 border border-violet-400">
+                <h3 class="text-lg font-semibold text-violet-300 mb-4">Remaining for Savings & Emergency</h3>
+                <div class="bg-blue-900 bg-opacity-50 p-4 rounded-lg mb-4">
+                    <div class="text-sm text-blue-200">Amount Left for Savings & Emergency Fund</div>
+                    <div class="text-3xl font-bold text-violet-400" id="remainingForSavings">₹0</div>
+                </div>
+                <div class="bg-blue-900 bg-opacity-50 p-4 rounded-lg mb-4">
+                    <div class="text-sm text-blue-200">Keep Money in Hand (Recommended: 5-10% of income)</div>
+                    <input type="number" id="moneyInHand" placeholder="Amount to keep in hand" class="w-full p-3 bg-blue-800 border border-blue-400 text-white rounded-lg focus:ring-2 focus:ring-pink-400 placeholder-blue-300 mt-2" onchange="updateRemainingBudget()">
+                </div>
+                <div class="text-sm text-blue-100 mb-4">We'll help you split the remaining amount optimally between savings and emergency fund in the next step.</div>
+            </div>
+
+            <button onclick="proceedToSavingsAllocation()" class="bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg">Proceed to Savings Allocation →</button>
+        </div>
+
+        <!-- Step 4: Savings Allocation -->
+        <div id="step4" class="hidden glass-card rounded-xl shadow-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold text-white mb-6">Allocate Savings & Emergency Fund</h2>
+            
+            <div id="savingsAllocationContent">
+                <!-- Content will be populated dynamically -->
+            </div>
+        </div>
+
+        <!-- Step 5: Budget Report -->
+        <div id="step5" class="hidden glass-card rounded-xl shadow-2xl p-8 mb-6">
+            <h2 class="text-2xl font-bold text-white mb-6">Your Monthly Budget Plan</h2>
+            
+            <div id="budgetReport" class="space-y-6">
+                <!-- Budget report will be generated here -->
+            </div>
+
+            <div class="mt-8 flex flex-wrap gap-4">
+                <button onclick="downloadReport()" class="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg">Download Report</button>
+                <button onclick="startTracking()" class="bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg">Start Daily Tracking</button>
+                <button onclick="resetBudget()" class="bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg">Create New Budget</button>
+            </div>
+        </div>
+
+        <!-- Daily Tracking Section -->
+        <div id="dailyTracking" class="hidden glass-card rounded-xl shadow-2xl p-8">
+            <h2 class="text-2xl font-bold text-white mb-6">Daily Expense Tracking</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div class="dark-card p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-sky-300 mb-4">Add Today's Expense</h3>
+                    <div class="space-y-3">
+                        <select id="expenseCategory" class="w-full p-3 bg-blue-800 border border-blue-400 text-white rounded-lg focus:ring-2 focus:ring-pink-400">
+                            <option value="">Select category...</option>
+                            <option value="health">Health & Medical</option>
+                            <option value="food">Food & Dining</option>
+                            <option value="travel">Travel & Transport</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <input type="number" id="expenseAmount" placeholder="Amount spent" class="w-full p-3 bg-blue-800 border border-blue-400 text-white rounded-lg focus:ring-2 focus:ring-pink-400 placeholder-blue-300">
+                        <input type="text" id="expenseNote" placeholder="Note (optional)" class="w-full p-3 bg-blue-800 border border-blue-400 text-white rounded-lg focus:ring-2 focus:ring-pink-400 placeholder-blue-300">
+                        <button onclick="addExpense()" class="w-full bg-gradient-to-r from-pink-500 to-violet-500 hover:from-pink-600 hover:to-violet-600 text-white py-3 rounded-lg font-medium">Add Expense</button>
+                    </div>
+                </div>
+                
+                <div class="dark-card p-6 rounded-lg">
+                    <h3 class="text-lg font-semibold text-violet-300 mb-4">Budget Overview</h3>
+                    <div id="budgetOverview" class="space-y-3">
+                        <!-- Budget overview will be populated -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="dark-card p-6 rounded-lg">
+                <h3 class="text-lg font-semibold text-pink-300 mb-4">Recent Expenses</h3>
+                <div id="recentExpenses" class="space-y-2">
+                    <!-- Recent expenses will be listed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let budgetData = {
+            month: '',
+            income: 0,
+            fixedExpenses: {},
+            variableExpenses: {},
+            emergencyFund: 0,
+            savingsAmount: 0,
+            moneyInHand: 0,
+            priorities: [],
+            dailyExpenses: [],
+            selectedCategories: [],
+            currentStep: 1
+        };
+
+        // Show notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.getElementById('notificationContainer').appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Navigation functions
+        function goToStep(step) {
+            // Allow going back to completed steps or current step
+            if (step > budgetData.currentStep) {
+                showNotification('Please complete the current step first!', 'warning');
+                return;
+            }
+            
+            // Hide all steps
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`step${i}`).classList.add('hidden');
+            }
+            document.getElementById('dailyTracking').classList.add('hidden');
+            
+            // Show target step
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            updateStepIndicator(step);
+            
+            // Show/hide back button
+            if (step > 1) {
+                document.getElementById('backBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('backBtn').classList.add('hidden');
+            }
+        }
+
+        function goBack() {
+            if (budgetData.currentStep > 1) {
+                const previousStep = budgetData.currentStep - 1;
+                
+                // Hide current step
+                document.getElementById(`step${budgetData.currentStep}`).classList.add('hidden');
+                document.getElementById('dailyTracking').classList.add('hidden');
+                
+                // Show previous step
+                document.getElementById(`step${previousStep}`).classList.remove('hidden');
+                updateStepIndicator(previousStep);
+                
+                // Hide back button if going to step 1
+                if (previousStep === 1) {
+                    document.getElementById('backBtn').classList.add('hidden');
+                }
+            }
+        }
+
+        function updateStepIndicator(activeStep) {
+            for (let i = 1; i <= 5; i++) {
+                const indicator = document.getElementById(`step${i}-indicator`);
+                if (i <= budgetData.currentStep) {
+                    indicator.className = 'step-indicator step-active w-10 h-10 rounded-full flex items-center justify-center text-white font-bold cursor-pointer';
+                } else {
+                    indicator.className = 'step-indicator bg-white bg-opacity-30 w-10 h-10 rounded-full flex items-center justify-center text-white font-bold cursor-pointer';
+                }
+            }
+        }
+
+        // Toggle category sections
+        document.addEventListener('DOMContentLoaded', function() {
+            const categories = ['rent', 'education', 'meals', 'loans', 'bills', 'travelFixed'];
+            
+            categories.forEach(category => {
+                const checkbox = document.getElementById(category + 'Category');
+                const section = document.getElementById(category + 'Section');
+                
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        section.classList.remove('hidden');
+                        budgetData.selectedCategories.push(category);
+                    } else {
+                        section.classList.add('hidden');
+                        budgetData.selectedCategories = budgetData.selectedCategories.filter(cat => cat !== category);
+                    }
+                });
+            });
+
+            // Enable drag and drop
+            enableDragAndDrop();
+        });
+
+        function goToStep2() {
+            const month = document.getElementById('monthSelect').value;
+            const income = parseFloat(document.getElementById('incomeInput').value);
+            
+            if (!month || !income || income <= 0) {
+                showNotification('Please select a month and enter a valid income amount!', 'error');
+                return;
+            }
+            
+            budgetData.month = month;
+            budgetData.income = income;
+            budgetData.currentStep = 2;
+            
+            // Hide step 1 and show step 2
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            updateStepIndicator(2);
+            document.getElementById('backBtn').classList.remove('hidden');
+            
+            showNotification('Income saved! Now select your expense categories.', 'success');
+        }
+
+        // Submit fixed expenses
+        function submitFixedExpenses() {
+            let totalFixed = 0;
+            let hasExpenses = false;
+            
+            budgetData.fixedExpenses = {};
+            
+            // Collect expenses from selected categories
+            if (budgetData.selectedCategories.includes('rent')) {
+                const rent = parseFloat(document.getElementById('rent').value) || 0;
+                const utilities = parseFloat(document.getElementById('utilities').value) || 0;
+                budgetData.fixedExpenses.rent = rent;
+                budgetData.fixedExpenses.utilities = utilities;
+                totalFixed += rent + utilities;
+                if (rent > 0 || utilities > 0) hasExpenses = true;
+            }
+            
+            if (budgetData.selectedCategories.includes('education')) {
+                const education = parseFloat(document.getElementById('education').value) || 0;
+                const books = parseFloat(document.getElementById('books').value) || 0;
+                budgetData.fixedExpenses.education = education;
+                budgetData.fixedExpenses.books = books;
+                totalFixed += education + books;
+                if (education > 0 || books > 0) hasExpenses = true;
+            }
+            
+            if (budgetData.selectedCategories.includes('meals')) {
+                const monthlyMeal = parseFloat(document.getElementById('monthlyMeal').value) || 0;
+                budgetData.fixedExpenses.monthlyMeal = monthlyMeal;
+                totalFixed += monthlyMeal;
+                if (monthlyMeal > 0) hasExpenses = true;
+            }
+            
+            if (budgetData.selectedCategories.includes('loans')) {
+                const emis = parseFloat(document.getElementById('emis').value) || 0;
+                const loans = parseFloat(document.getElementById('loans').value) || 0;
+                budgetData.fixedExpenses.emis = emis;
+                budgetData.fixedExpenses.loans = loans;
+                totalFixed += emis + loans;
+                if (emis > 0 || loans > 0) hasExpenses = true;
+            }
+
+            if (budgetData.selectedCategories.includes('bills')) {
+                const recharge = parseFloat(document.getElementById('recharge').value) || 0;
+                const subscriptions = parseFloat(document.getElementById('subscriptions').value) || 0;
+                budgetData.fixedExpenses.recharge = recharge;
+                budgetData.fixedExpenses.subscriptions = subscriptions;
+                totalFixed += recharge + subscriptions;
+                if (recharge > 0 || subscriptions > 0) hasExpenses = true;
+            }
+
+            if (budgetData.selectedCategories.includes('travelFixed')) {
+                const travelFixed = parseFloat(document.getElementById('travelFixed').value) || 0;
+                budgetData.fixedExpenses.travelFixed = travelFixed;
+                totalFixed += travelFixed;
+                if (travelFixed > 0) hasExpenses = true;
+            }
+            
+            if (totalFixed >= budgetData.income * 0.8) {
+                showNotification('Warning: Fixed expenses are too high! Consider reducing them.', 'warning');
+            }
+            
+            // Show summary and hide form
+            showFixedExpensesSummary(totalFixed);
+            showNotification('Fixed expenses saved successfully!', 'success');
+        }
+
+        function showFixedExpensesSummary(totalFixed) {
+            let summaryHTML = `
+                <div class="bg-white bg-opacity-95 p-4 rounded-lg mb-4 border-2 border-sky-400">
+                    <div class="text-2xl font-bold text-sky-700 mb-2">₹${totalFixed.toLocaleString()}</div>
+                    <div class="text-sm text-gray-700 font-medium">${((totalFixed/budgetData.income)*100).toFixed(1)}% of your income</div>
+                </div>
+                <div class="space-y-2 text-sm bg-white bg-opacity-90 p-4 rounded-lg border border-sky-300">
+            `;
+            
+            Object.entries(budgetData.fixedExpenses).forEach(([key, value]) => {
+                if (value > 0) {
+                    summaryHTML += `<div class="flex justify-between text-blue-900 py-1 border-b border-gray-300 last:border-b-0"><span class="capitalize font-medium">${key.replace(/([A-Z])/g, ' $1')}</span><span class="font-bold text-blue-800">₹${value.toLocaleString()}</span></div>`;
+                }
+            });
+            
+            summaryHTML += '</div>';
+            
+            document.getElementById('fixedSummaryContent').innerHTML = summaryHTML;
+            document.getElementById('fixedExpensesSummary').classList.remove('hidden');
+            
+            // Show budget allocation section
+            showBudgetAllocation(totalFixed);
+        }
+
+        function showBudgetAllocation(totalFixed) {
+            const remainingIncome = budgetData.income - totalFixed;
+            const recommendedSavings = Math.round(budgetData.income * 0.2);
+            const recommendedVariable = Math.round(budgetData.income * 0.3);
+            
+            document.getElementById('budgetGuidance').innerHTML = `
+                <div class="bg-white bg-opacity-95 p-6 rounded-lg mb-4 border-2 border-blue-500">
+                    <h4 class="font-bold text-blue-800 mb-4 text-lg">Budget Breakdown</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-gray-800 py-2 border-b border-gray-300">
+                            <span class="font-medium">Total Income:</span>
+                            <span class="font-bold text-blue-700">₹${budgetData.income.toLocaleString()}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-800 py-2 border-b border-gray-300">
+                            <span class="font-medium">Fixed Expenses:</span>
+                            <span class="font-bold text-red-600">₹${totalFixed.toLocaleString()}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-800 py-2 border-t-2 border-blue-500 pt-3">
+                            <span class="font-bold">Available for Variables & Savings:</span>
+                            <span class="font-bold text-green-600 text-lg">₹${remainingIncome.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white bg-opacity-90 p-6 rounded-lg border-2 border-violet-500">
+                    <h4 class="font-bold text-violet-800 mb-3 text-lg">Smart Budgeting Suggestions</h4>
+                    <p class="text-gray-800 font-medium mb-3">Based on the 50-30-20 rule, we recommend:</p>
+                    <ul class="text-gray-800 space-y-2">
+                        <li class="flex items-center"><span class="text-violet-600 font-bold mr-2">•</span> Variable expenses: <span class="font-bold text-blue-700 ml-2">₹${recommendedVariable.toLocaleString()}</span> <span class="text-gray-600">(30% of income)</span></li>
+                        <li class="flex items-center"><span class="text-violet-600 font-bold mr-2">•</span> Savings & Emergency: <span class="font-bold text-green-600 ml-2">₹${recommendedSavings.toLocaleString()}</span> <span class="text-gray-600">(20% of income)</span></li>
+                        <li class="flex items-center"><span class="text-violet-600 font-bold mr-2">•</span> Keep some money in hand for unexpected needs</li>
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('budgetAllocationSection').classList.remove('hidden');
+        }
+
+        function editFixedExpenses() {
+            document.getElementById('fixedExpensesSummary').classList.add('hidden');
+            document.getElementById('budgetAllocationSection').classList.add('hidden');
+        }
+
+        function proceedToPriorities() {
+            budgetData.currentStep = 3;
+            
+            // Hide step 2 and show step 3
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+            updateStepIndicator(3);
+            
+            // Update displays
+            const totalFixed = Object.values(budgetData.fixedExpenses).reduce((sum, val) => sum + val, 0);
+            document.getElementById('totalIncomeDisplay').textContent = `₹${budgetData.income.toLocaleString()}`;
+            document.getElementById('fixedExpensesDisplay').textContent = `₹${totalFixed.toLocaleString()}`;
+            document.getElementById('availableAmount').textContent = `₹${(budgetData.income - totalFixed).toLocaleString()}`;
+            
+            updateRemainingBudget();
+        }
+
+        function enableDragAndDrop() {
+            const priorityList = document.getElementById('priorityList');
+            let draggedElement = null;
+
+            priorityList.addEventListener('dragstart', function(e) {
+                draggedElement = e.target.closest('.priority-item');
+                draggedElement.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            priorityList.addEventListener('dragend', function(e) {
+                if (draggedElement) {
+                    draggedElement.classList.remove('dragging');
+                }
+            });
+
+            priorityList.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+
+            priorityList.addEventListener('drop', function(e) {
+                e.preventDefault();
+                const targetElement = e.target.closest('.priority-item');
+                
+                if (targetElement && targetElement !== draggedElement) {
+                    const rect = targetElement.getBoundingClientRect();
+                    const midpoint = rect.top + rect.height / 2;
+                    
+                    if (e.clientY < midpoint) {
+                        priorityList.insertBefore(draggedElement, targetElement);
+                    } else {
+                        priorityList.insertBefore(draggedElement, targetElement.nextSibling);
+                    }
+                    
+                    updatePriorityNumbers();
+                }
+            });
+        }
+
+        function updatePriorityNumbers() {
+            document.querySelectorAll('.priority-item').forEach((item, index) => {
+                item.querySelector('.priority-number').textContent = index + 1;
+            });
+        }
+
+        function updateRemainingBudget() {
+            const totalFixed = Object.values(budgetData.fixedExpenses).reduce((sum, val) => sum + val, 0);
+            let totalVariableEstimates = 0;
+            const moneyInHand = parseFloat(document.getElementById('moneyInHand')?.value) || 0;
+            
+            document.querySelectorAll('.priority-budget').forEach(input => {
+                totalVariableEstimates += parseFloat(input.value) || 0;
+            });
+            
+            const remainingForSavings = budgetData.income - totalFixed - totalVariableEstimates - moneyInHand;
+            const remainingElement = document.getElementById('remainingForSavings');
+            
+            if (remainingElement) {
+                remainingElement.textContent = `₹${remainingForSavings.toLocaleString()}`;
+                remainingElement.className = remainingForSavings >= 0 ? 
+                    'text-3xl font-bold text-violet-400' : 
+                    'text-3xl font-bold text-red-400';
+            }
+            
+            if (remainingForSavings < 0) {
+                showNotification('Warning: Your estimates exceed available budget!', 'warning');
+            }
+        }
+
+        function proceedToSavingsAllocation() {
+            const totalFixed = Object.values(budgetData.fixedExpenses).reduce((sum, val) => sum + val, 0);
+            let totalVariableEstimates = 0;
+            const priorities = [];
+            const moneyInHand = parseFloat(document.getElementById('moneyInHand').value) || 0;
+            
+            // Collect variable expense estimates and priorities
+            document.querySelectorAll('.priority-item').forEach((item, index) => {
+                const category = item.dataset.category;
+                const budget = parseFloat(item.querySelector('.priority-budget').value) || 0;
+                totalVariableEstimates += budget;
+                
+                priorities.push({
+                    category: category,
+                    priority: index + 1,
+                    budget: budget
+                });
+            });
+            
+            const remainingForSavings = budgetData.income - totalFixed - totalVariableEstimates - moneyInHand;
+            
+            if (remainingForSavings < 0) {
+                showNotification('Please reduce your estimates to proceed!', 'error');
+                return;
+            }
+            
+            budgetData.priorities = priorities;
+            budgetData.remainingForSavings = remainingForSavings;
+            budgetData.moneyInHand = moneyInHand;
+            budgetData.currentStep = 4;
+            
+            // Hide step 3 and show step 4
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('step4').classList.remove('hidden');
+            updateStepIndicator(4);
+            
+            // Show savings allocation step
+            showSavingsAllocationStep(remainingForSavings);
+        }
+
+        function showSavingsAllocationStep(remainingAmount) {
+            document.getElementById('savingsAllocationContent').innerHTML = `
+                <div class="dark-card p-6 rounded-lg mb-6 border border-green-400">
+                    <h3 class="text-lg font-semibold text-green-300 mb-3">Available for Savings & Emergency</h3>
+                    <div class="text-4xl font-bold text-green-400 mb-2">₹${remainingAmount.toLocaleString()}</div>
+                    <div class="text-sm text-blue-100">After fixed expenses, variable estimates, and money in hand</div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6 mb-6">
+                    <div class="dark-card p-6 rounded-lg border border-blue-400">
+                        <h4 class="text-lg font-semibold text-blue-300 mb-4">Savings</h4>
+                        <div class="mb-4">
+                            <label class="block text-sm text-blue-200 mb-2">Amount for Savings</label>
+                            <input type="number" id="savingsAmount" max="${remainingAmount}" class="w-full p-3 bg-blue-800 bg-opacity-70 border border-blue-400 text-white rounded-lg focus:ring-2 focus:ring-pink-400 placeholder-blue-300" placeholder="Enter savings amount" onchange="updateSavingsAllocation()">
+                        </div>
+                        <div class="text-sm text-blue-200">
+                            Recommended: ₹${Math.round(remainingAmount * 0.6)} - ₹${Math.round(remainingAmount * 0.8)} (60-80% of remaining)
+                        </div>
+                    </div>
+                    
+                    <div class="dark-card p-6 rounded-lg border border-red-400">
+                        <h4 class="text-lg font-semibold text-red-300 mb-4">Emergency Fund</h4>
+                        <div class="mb-4">
+                            <label class="block text-sm text-red-200 mb-2">Amount for Emergency Fund</label>
+                            <input type="number" id="emergencyAmount" max="${remainingAmount}" class="w-full p-3 bg-blue-800 bg-opacity-70 border border-red-400 text-white rounded-lg focus:ring-2 focus:ring-pink-400 placeholder-blue-300" placeholder="Enter emergency fund amount" onchange="updateSavingsAllocation()">
+                        </div>
+                        <div class="text-sm text-red-200">
+                            Recommended: ₹${Math.round(remainingAmount * 0.2)} - ₹${Math.round(remainingAmount * 0.4)} (20-40% of remaining)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dark-card p-4 rounded-lg mb-6 border border-violet-400">
+                    <div class="flex justify-between items-center">
+                        <span class="text-violet-200">Total Allocated:</span>
+                        <span class="text-xl font-bold text-white" id="totalAllocated">₹0</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-violet-200">Remaining:</span>
+                        <span class="text-xl font-bold" id="remainingAmount">₹${remainingAmount.toLocaleString()}</span>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-blue-800 to-violet-800 p-6 rounded-lg mb-6 border border-pink-400">
+                    <h4 class="text-lg font-semibold text-pink-300 mb-3">Smart Recommendations</h4>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <button onclick="applySuggestion(60, 40)" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg text-sm transition-colors">
+                            60% Savings, 40% Emergency
+                        </button>
+                        <button onclick="applySuggestion(70, 30)" class="bg-violet-600 hover:bg-violet-700 text-white p-3 rounded-lg text-sm transition-colors">
+                            70% Savings, 30% Emergency
+                        </button>
+                    </div>
+                </div>
+                
+                <button onclick="finalizeBudget()" class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-lg">Finalize Budget Plan →</button>
+            `;
+        }
+
+        function applySuggestion(savingsPercent, emergencyPercent) {
+            const remainingAmount = budgetData.remainingForSavings;
+            const savingsAmount = Math.round(remainingAmount * savingsPercent / 100);
+            const emergencyAmount = Math.round(remainingAmount * emergencyPercent / 100);
+            
+            document.getElementById('savingsAmount').value = savingsAmount;
+            document.getElementById('emergencyAmount').value = emergencyAmount;
+            updateSavingsAllocation();
+        }
+
+        function updateSavingsAllocation() {
+            const savingsAmount = parseFloat(document.getElementById('savingsAmount').value) || 0;
+            const emergencyAmount = parseFloat(document.getElementById('emergencyAmount').value) || 0;
+            const totalAllocated = savingsAmount + emergencyAmount;
+            const remaining = budgetData.remainingForSavings - totalAllocated;
+            
+            document.getElementById('totalAllocated').textContent = `₹${totalAllocated.toLocaleString()}`;
+            const remainingElement = document.getElementById('remainingAmount');
+            remainingElement.textContent = `₹${remaining.toLocaleString()}`;
+            remainingElement.className = remaining >= 0 ? 'text-xl font-bold text-green-400' : 'text-xl font-bold text-red-400';
+            
+            if (remaining < 0) {
+                showNotification('Total allocation exceeds available amount!', 'warning');
+            }
+        }
+
+        function finalizeBudget() {
+            const savingsAmount = parseFloat(document.getElementById('savingsAmount').value) || 0;
+            const emergencyAmount = parseFloat(document.getElementById('emergencyAmount').value) || 0;
+            
+            if (savingsAmount + emergencyAmount > budgetData.remainingForSavings) {
+                showNotification('Total allocation exceeds available amount!', 'error');
+                return;
+            }
+            
+            budgetData.savingsAmount = savingsAmount;
+            budgetData.emergencyFund = emergencyAmount;
+            budgetData.currentStep = 5;
+            
+            // Hide step 4 and show step 5
+            document.getElementById('step4').classList.add('hidden');
+            document.getElementById('step5').classList.remove('hidden');
+            updateStepIndicator(5);
+            
+            generateBudgetReport();
+            showNotification('Budget plan finalized successfully!', 'success');
+        }
+
+        function generateBudgetReport() {
+            const totalFixed = Object.values(budgetData.fixedExpenses).reduce((sum, val) => sum + val, 0);
+            const totalVariable = budgetData.priorities.reduce((sum, item) => sum + item.budget, 0);
+            const totalBudget = totalFixed + totalVariable + budgetData.savingsAmount + budgetData.emergencyFund + budgetData.moneyInHand;
+            const remaining = budgetData.income - totalBudget;
+
+            document.getElementById('budgetReport').innerHTML = `
+                <div class="bg-gradient-to-r from-blue-600 to-violet-700 text-white p-6 rounded-lg mb-6 shadow-2xl">
+                    <h3 class="text-2xl font-bold mb-2">${budgetData.month} Budget Plan</h3>
+                    <div class="text-lg">Total Income: ₹${budgetData.income.toLocaleString()}</div>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div class="dark-card p-4 rounded-lg border-l-4 border-red-400">
+                        <div class="text-red-300 font-semibold text-sm">Fixed Expenses</div>
+                        <div class="text-2xl font-bold text-red-200">₹${totalFixed.toLocaleString()}</div>
+                    </div>
+                    <div class="dark-card p-4 rounded-lg border-l-4 border-yellow-400">
+                        <div class="text-yellow-300 font-semibold text-sm">Variable Expenses</div>
+                        <div class="text-2xl font-bold text-yellow-200">₹${totalVariable.toLocaleString()}</div>
+                    </div>
+                    <div class="dark-card p-4 rounded-lg border-l-4 border-green-400">
+                        <div class="text-green-300 font-semibold text-sm">Savings</div>
+                        <div class="text-2xl font-bold text-green-200">₹${budgetData.savingsAmount.toLocaleString()}</div>
+                    </div>
+                    <div class="dark-card p-4 rounded-lg border-l-4 border-purple-400">
+                        <div class="text-purple-300 font-semibold text-sm">Emergency Fund</div>
+                        <div class="text-2xl font-bold text-purple-200">₹${budgetData.emergencyFund.toLocaleString()}</div>
+                    </div>
+                </div>
+                
+                <div class="dark-card p-4 rounded-lg border-l-4 border-pink-400 mb-6">
+                    <div class="text-pink-300 font-semibold text-sm">Money in Hand</div>
+                    <div class="text-2xl font-bold text-pink-200">₹${budgetData.moneyInHand.toLocaleString()}</div>
+                </div>
+
+                <div class="dark-card p-6 rounded-lg mb-6 border border-sky-400">
+                    <h4 class="text-lg font-semibold text-white mb-4">Detailed Breakdown</h4>
+                    <div class="space-y-3">
+                        ${Object.entries(budgetData.fixedExpenses).map(([key, value]) => 
+                            value > 0 ? `<div class="flex justify-between text-blue-100"><span class="capitalize">${key.replace(/([A-Z])/g, ' $1')}</span><span class="font-semibold text-white">₹${value.toLocaleString()}</span></div>` : ''
+                        ).join('')}
+                        ${budgetData.priorities.map(item => 
+                            `<div class="flex justify-between text-blue-100"><span class="capitalize">${item.category.replace(/([A-Z])/g, ' $1')} (Priority ${item.priority})</span><span class="font-semibold text-white">₹${item.budget.toLocaleString()}</span></div>`
+                        ).join('')}
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-lg ${remaining >= 0 ? 'bg-green-800 bg-opacity-50 border-green-400' : 'bg-red-800 bg-opacity-50 border-red-400'} border">
+                    <div class="text-lg font-semibold ${remaining >= 0 ? 'text-green-300' : 'text-red-300'}">
+                        ${remaining >= 0 ? 'Budget Balanced!' : 'Budget Exceeded!'}
+                    </div>
+                    <div class="text-sm ${remaining >= 0 ? 'text-green-200' : 'text-red-200'}">
+                        ${remaining >= 0 ? `You have ₹${remaining.toLocaleString()} remaining` : `You're over budget by ₹${Math.abs(remaining).toLocaleString()}`}
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-gradient-to-r from-blue-800 to-violet-800 rounded-lg border border-pink-400">
+                    <h4 class="font-semibold text-pink-300 mb-2">Smart Recommendations</h4>
+                    <ul class="text-sm text-blue-100 space-y-1">
+                        <li>• Keep emergency fund for unexpected medical expenses or job loss</li>
+                        <li>• Review and adjust variable expenses weekly</li>
+                        <li>• Consider increasing savings if you consistently stay under budget</li>
+                        <li>• Track daily expenses to stay within limits</li>
+                        <li>• Use money in hand for small unexpected expenses</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        function startTracking() {
+            document.getElementById('step5').classList.add('hidden');
+            document.getElementById('dailyTracking').classList.remove('hidden');
+            updateBudgetOverview();
+        }
+
+        function updateBudgetOverview() {
+            const spent = {};
+            budgetData.dailyExpenses.forEach(expense => {
+                spent[expense.category] = (spent[expense.category] || 0) + expense.amount;
+            });
+
+            let overviewHTML = '';
+            budgetData.priorities.forEach(item => {
+                const spentAmount = spent[item.category] || 0;
+                const remaining = item.budget - spentAmount;
+                const percentage = item.budget > 0 ? (spentAmount / item.budget) * 100 : 0;
+                
+                overviewHTML += `
+                    <div class="bg-blue-900 bg-opacity-50 p-3 rounded-lg border border-blue-400">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-medium capitalize text-blue-100">${item.category}</span>
+                            <span class="text-sm ${remaining >= 0 ? 'text-green-300' : 'text-red-300'}">
+                                ₹${remaining.toLocaleString()} left
+                            </span>
+                        </div>
+                        <div class="w-full bg-blue-800 rounded-full h-2">
+                            <div class="progress-bar h-2 rounded-full ${percentage > 100 ? 'bg-red-400' : percentage > 80 ? 'bg-yellow-400' : 'bg-green-400'}" 
+                                 style="width: ${Math.min(percentage, 100)}%"></div>
+                        </div>
+                        <div class="text-xs text-blue-200 mt-1">₹${spentAmount.toLocaleString()} / ₹${item.budget.toLocaleString()}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('budgetOverview').innerHTML = overviewHTML;
+        }
+
+        function addExpense() {
+            const category = document.getElementById('expenseCategory').value;
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const note = document.getElementById('expenseNote').value;
+
+            if (!category || !amount || amount <= 0) {
+                showNotification('Please select a category and enter a valid amount.', 'error');
+                return;
+            }
+
+            // Check if expense exceeds budget
+            const categoryBudget = budgetData.priorities.find(p => p.category === category);
+            if (categoryBudget) {
+                const spent = budgetData.dailyExpenses
+                    .filter(e => e.category === category)
+                    .reduce((sum, e) => sum + e.amount, 0);
+                
+                if (spent + amount > categoryBudget.budget) {
+                    showNotification(`Warning: This expense will exceed your ${category} budget!`, 'warning');
+                }
+            }
+
+            const expense = {
+                date: new Date().toLocaleDateString(),
+                category: category,
+                amount: amount,
+                note: note
+            };
+
+            budgetData.dailyExpenses.push(expense);
+            
+            // Clear form
+            document.getElementById('expenseCategory').value = '';
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseNote').value = '';
+
+            updateBudgetOverview();
+            updateRecentExpenses();
+            showNotification('Expense added successfully!', 'success');
+        }
+
+        function updateRecentExpenses() {
+            const recentExpenses = budgetData.dailyExpenses.slice(-10).reverse();
+            let expensesHTML = '';
+
+            recentExpenses.forEach(expense => {
+                expensesHTML += `
+                    <div class="flex justify-between items-center p-3 bg-blue-900 bg-opacity-50 rounded-lg border border-blue-400">
+                        <div>
+                            <div class="font-medium capitalize text-blue-100">${expense.category}</div>
+                            <div class="text-sm text-blue-200">${expense.date}${expense.note ? ' • ' + expense.note : ''}</div>
+                        </div>
+                        <div class="font-bold text-red-300">-₹${expense.amount.toLocaleString()}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('recentExpenses').innerHTML = expensesHTML || '<div class="text-blue-200 text-center py-4">No expenses recorded yet</div>';
+        }
+
+        function downloadReport() {
+            const reportData = {
+                month: budgetData.month,
+                income: budgetData.income,
+                fixedExpenses: budgetData.fixedExpenses,
+                variableExpenses: budgetData.priorities,
+                savings: budgetData.savingsAmount,
+                emergencyFund: budgetData.emergencyFund,
+                moneyInHand: budgetData.moneyInHand
+            };
+            
+            const reportContent = `Budget Report for ${budgetData.month}\n\n` +
+                `Income: ₹${budgetData.income.toLocaleString()}\n\n` +
+                `Fixed Expenses:\n${Object.entries(budgetData.fixedExpenses).map(([key, value]) => 
+                    value > 0 ? `${key}: ₹${value.toLocaleString()}` : '').filter(Boolean).join('\n')}\n\n` +
+                `Variable Expenses:\n${budgetData.priorities.map(item => 
+                    `${item.category} (Priority ${item.priority}): ₹${item.budget.toLocaleString()}`).join('\n')}\n\n` +
+                `Savings: ₹${budgetData.savingsAmount.toLocaleString()}\n` +
+                `Emergency Fund: ₹${budgetData.emergencyFund.toLocaleString()}\n` +
+                `Money in Hand: ₹${budgetData.moneyInHand.toLocaleString()}`;
+            
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Budget_Report_${budgetData.month}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Budget report downloaded successfully!', 'success');
+        }
+
+        function resetBudget() {
+            if (confirm('Are you sure you want to create a new budget? This will clear all current data.')) {
+                // Reset budget data
+                budgetData = {
+                    month: '',
+                    income: 0,
+                    fixedExpenses: {},
+                    variableExpenses: {},
+                    emergencyFund: 0,
+                    savingsAmount: 0,
+                    moneyInHand: 0,
+                    priorities: [],
+                    dailyExpenses: [],
+                    selectedCategories: [],
+                    currentStep: 1
+                };
+                
+                // Reset all forms
+                document.querySelectorAll('input').forEach(input => {
+                    input.value = '';
+                    if (input.type === 'checkbox') {
+                        input.checked = false;
+                    }
+                });
+                document.getElementById('monthSelect').value = '';
+                
+                // Hide all dynamic sections
+                document.querySelectorAll('[id$="Section"]').forEach(section => {
+                    section.classList.add('hidden');
+                });
+                
+                // Hide summary sections
+                document.getElementById('fixedExpensesSummary').classList.add('hidden');
+                document.getElementById('budgetAllocationSection').classList.add('hidden');
+                
+                // Hide all steps except step 1
+                for (let i = 2; i <= 5; i++) {
+                    document.getElementById(`step${i}`).classList.add('hidden');
+                }
+                document.getElementById('dailyTracking').classList.add('hidden');
+                
+                // Show step 1
+                document.getElementById('step1').classList.remove('hidden');
+                
+                // Reset step indicators
+                updateStepIndicator(1);
+                
+                // Hide back button
+                document.getElementById('backBtn').classList.add('hidden');
+                
+                showNotification('New budget created! Start fresh.', 'success');
+            }
+        }
+
+        // Initialize
+        updateStepIndicator(1);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'989342ca76171daf',t:'MTc1OTU2NjAzNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
 
