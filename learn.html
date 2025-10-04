@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NariNexGen - Financial Learning Hub</title>
+    <style>
+        body {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .progress-overview {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            color: white;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .learning-path {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .module-card.locked {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .module-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .module-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+
+        .module-subtitle {
+            color: #666;
+            font-size: 0.9rem;
+            margin: 5px 0 15px 0;
+        }
+
+        .module-progress {
+            background: #f0f0f0;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .module-progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .lesson-list {
+            margin-bottom: 20px;
+        }
+
+        .lesson-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .lesson-item:hover {
+            background: #e3f2fd;
+            border-color: #2196F3;
+            transform: translateX(5px);
+        }
+
+        .lesson-item.completed {
+            background: #e8f5e8;
+            border-color: #4CAF50;
+        }
+
+        .lesson-item.current {
+            background: #fff3e0;
+            border-color: #FF9800;
+            animation: pulse 2s infinite;
+        }
+
+        .lesson-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 152, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 152, 0, 0); }
+        }
+
+        .lesson-status {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .lesson-status.completed {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .lesson-status.current {
+            background: #FF9800;
+            color: white;
+        }
+
+        .lesson-status.locked {
+            background: #ddd;
+            color: #999;
+        }
+
+        .lesson-content-wrapper {
+            flex: 1;
+        }
+
+        .lesson-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .lesson-type {
+            font-size: 0.8rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .lesson-duration {
+            color: #666;
+            font-size: 0.85rem;
+            margin-left: auto;
+        }
+
+        .start-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .start-button:disabled {
+            background: #ddd;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Learning Interface Modal */
+        .learning-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .learning-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .learning-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .lesson-progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .progress-steps {
+            display: flex;
+            gap: 8px;
+        }
+
+        .progress-step {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .learning-body {
+            padding: 30px;
+        }
+
+        .lesson-step {
+            display: none;
+        }
+
+        .lesson-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .lesson-content h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .lesson-content p {
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .lesson-content ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        .lesson-content li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .simulation-area {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #dee2e6;
+            position: relative;
+        }
+
+        .simulation-area::before {
+            content: '🎮';
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .simulation-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .budget-simulator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .results-area {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .result-positive {
+            color: #4CAF50;
+        }
+
+        .result-negative {
+            color: #f44336;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .achievement-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+
+        .achievement-popup.show {
+            transform: translateX(0);
+        }
+
+        .streak-indicator {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .challenge-complete {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .challenge-complete h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+        }
+
+        .xp-gained {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .learning-path {
+                grid-template-columns: 1fr;
+            }
+            
+            .budget-simulator {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 NariNexGen Financial Learning</h1>
+            <p>Learn → Practice → Master → Advance</p>
+        </div>
+
+        <div class="progress-overview">
+            <div class="progress-bar">
+                <div class="progress-fill" id="overallProgress" style="width: 15%"></div>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="lessonsCompleted">3</span>
+                    <span>Lessons Completed</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="xpPoints">450</span>
+                    <span>XP Points</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="streakDays">5</span>
+                    <span>Day Streak 🔥</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="badgesEarned">2</span>
+                    <span>Badges Earned</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="learning-path">
+            <!-- Module 1: Budgeting Basics -->
+            <div class="module-card" id="module-budgeting">
+                <div class="module-header">
+                    <div class="module-icon" style="background: linear-gradient(135deg, #4CAF50, #45a049);">💰</div>
+                    <div>
+                        <h3 class="module-title">Budgeting Fundamentals</h3>
+                        <p class="module-subtitle">Master the 50/30/20 rule through practice</p>
+                    </div>
+                </div>
+                <div class="streak-indicator">
+                    🔥 Current streak: <span id="budgetStreak">2</span> days
+                </div>
+                <div class="module-progress">
+                    <div class="module-progress-fill" id="budgetingProgress" style="width: 60%"></div>
+                </div>
+                <div class="lesson-list">
+                    <div class="lesson-item completed" onclick="openLesson('budget-theory')">
+                        <div class="lesson-status completed">✓</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Budget Theory & 50/30/20 Rule</div>
+                            <div class="lesson-type">📚 Theory • Completed</div>
+                        </div>
+                        <div class="lesson-duration">2 min</div>
+                    </div>
+                    <div class="lesson-item completed" onclick="openLesson('budget-practice')">
+                        <div class="lesson-status completed">✓</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Budget Practice Simulation</div>
+                            <div class="lesson-type">🎮 Practice • Completed</div>
+                        </div>
+                        <div class="lesson-duration">5 min</div>
+                    </div>
+                    <div class="lesson-item current" onclick="openLesson('budget-challenge')">
+                        <div class="lesson-status current">▶</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Real-World Budget Challenge</div>
+                            <div class="lesson-type">🏆 Challenge • Active</div>
+                        </div>
+                        <div class="lesson-duration">3 min</div>
+                    </div>
+                </div>
+                <button class="start-button" onclick="openLesson('budget-challenge')">Continue Challenge</button>
+            </div>
+
+            <!-- Module 2: Saving Strategies -->
+            <div class="module-card" id="module-saving">
+                <div class="module-header">
+                    <div class="module-icon" style="background: linear-gradient(135deg, #2196F3, #1976D2);">🏦</div>
+                    <div>
+                        <h3 class="module-title">Smart Saving Strategies</h3>
+                        <p class="module-subtitle">Emergency funds & compound interest</p>
+                    </div>
+                </div>
+                <div class="streak-indicator">
+                    🔥 Ready to start streak!
+                </div>
+                <div class="module-progress">
+                    <div class="module-progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="lesson-list">
+                    <div class="lesson-item current" onclick="openLesson('saving-theory')">
+                        <div class="lesson-status current">▶</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Emergency Fund Basics</div>
+                            <div class="lesson-type">📚 Theory • Ready</div>
+                        </div>
+                        <div class="lesson-duration">2 min</div>
+                    </div>
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Savings Growth Calculator</div>
+                            <div class="lesson-type">🎮 Practice • Locked</div>
+                        </div>
+                        <div class="lesson-duration">4 min</div>
+                    </div>
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Compound Interest Challenge</div>
+                            <div class="lesson-type">🏆 Challenge • Locked</div>
+                        </div>
+                        <div class="lesson-duration">3 min</div>
+                    </div>
+                </div>
+                <button class="start-button" onclick="openLesson('saving-theory')">Start Learning</button>
+            </div>
+
+            <!-- Module 3: Debt Management -->
+            <div class="module-card locked" id="module-debt">
+                <div class="module-header">
+                    <div class="module-icon" style="background: linear-gradient(135deg, #FF9800, #F57C00);">📊</div>
+                    <div>
+                        <h3 class="module-title">Debt Elimination</h3>
+                        <p class="module-subtitle">Snowball vs Avalanche methods</p>
+                    </div>
+                </div>
+                <div class="streak-indicator" style="opacity: 0.5;">
+                    🔒 Complete previous module
+                </div>
+                <div class="module-progress">
+                    <div class="module-progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="lesson-list">
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Understanding Debt Types</div>
+                            <div class="lesson-type">📚 Theory • Locked</div>
+                        </div>
+                        <div class="lesson-duration">2 min</div>
+                    </div>
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Debt Payoff Simulator</div>
+                            <div class="lesson-type">🎮 Practice • Locked</div>
+                        </div>
+                        <div class="lesson-duration">5 min</div>
+                    </div>
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Debt Strategy Challenge</div>
+                            <div class="lesson-type">🏆 Challenge • Locked</div>
+                        </div>
+                        <div class="lesson-duration">4 min</div>
+                    </div>
+                </div>
+                <button class="start-button" disabled>Complete Previous Module</button>
+            </div>
+
+            <!-- Module 4: Investment Basics -->
+            <div class="module-card locked" id="module-investment">
+                <div class="module-header">
+                    <div class="module-icon" style="background: linear-gradient(135deg, #9C27B0, #7B1FA2);">📈</div>
+                    <div>
+                        <h3 class="module-title">Investment Fundamentals</h3>
+                        <p class="module-subtitle">Risk, return & portfolio building</p>
+                    </div>
+                </div>
+                <div class="streak-indicator" style="opacity: 0.5;">
+                    🔒 Complete previous modules
+                </div>
+                <div class="module-progress">
+                    <div class="module-progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="lesson-list">
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Risk vs Return Theory</div>
+                            <div class="lesson-type">📚 Theory • Locked</div>
+                        </div>
+                        <div class="lesson-duration">3 min</div>
+                    </div>
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Portfolio Builder Simulator</div>
+                            <div class="lesson-type">🎮 Practice • Locked</div>
+                        </div>
+                        <div class="lesson-duration">6 min</div>
+                    </div>
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Investment Strategy Challenge</div>
+                            <div class="lesson-type">🏆 Challenge • Locked</div>
+                        </div>
+                        <div class="lesson-duration">5 min</div>
+                    </div>
+                </div>
+                <button class="start-button" disabled>Complete Previous Modules</button>
+            </div>
+
+            <!-- Module 5: Credit & Loans -->
+            <div class="module-card locked" id="module-credit">
+                <div class="module-header">
+                    <div class="module-icon" style="background: linear-gradient(135deg, #E91E63, #C2185B);">💳</div>
+                    <div>
+                        <h3 class="module-title">Credit & Loans</h3>
+                        <p class="module-subtitle">Credit scores & smart borrowing</p>
+                    </div>
+                </div>
+                <div class="streak-indicator" style="opacity: 0.5;">
+                    🔒 Complete previous modules
+                </div>
+                <div class="module-progress">
+                    <div class="module-progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="lesson-list">
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Credit Score Fundamentals</div>
+                            <div class="lesson-type">📚 Theory • Locked</div>
+                        </div>
+                        <div class="lesson-duration">3 min</div>
+                    </div>
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Loan Calculator Practice</div>
+                            <div class="lesson-type">🎮 Practice • Locked</div>
+                        </div>
+                        <div class="lesson-duration">4 min</div>
+                    </div>
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Credit Building Challenge</div>
+                            <div class="lesson-type">🏆 Challenge • Locked</div>
+                        </div>
+                        <div class="lesson-duration">5 min</div>
+                    </div>
+                </div>
+                <button class="start-button" disabled>Complete Previous Modules</button>
+            </div>
+
+            <!-- Module 6: Tax Planning -->
+            <div class="module-card locked" id="module-tax">
+                <div class="module-header">
+                    <div class="module-icon" style="background: linear-gradient(135deg, #607D8B, #455A64);">📋</div>
+                    <div>
+                        <h3 class="module-title">Tax Planning</h3>
+                        <p class="module-subtitle">Deductions & tax-efficient investing</p>
+                    </div>
+                </div>
+                <div class="streak-indicator" style="opacity: 0.5;">
+                    🔒 Complete all previous modules
+                </div>
+                <div class="module-progress">
+                    <div class="module-progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="lesson-list">
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Tax Deduction Basics</div>
+                            <div class="lesson-type">📚 Theory • Locked</div>
+                        </div>
+                        <div class="lesson-duration">3 min</div>
+                    </div>
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Tax Calculator Simulator</div>
+                            <div class="lesson-type">🎮 Practice • Locked</div>
+                        </div>
+                        <div class="lesson-duration">5 min</div>
+                    </div>
+                    <div class="lesson-item locked">
+                        <div class="lesson-status locked">🔒</div>
+                        <div class="lesson-content-wrapper">
+                            <div class="lesson-title">Tax Optimization Challenge</div>
+                            <div class="lesson-type">🏆 Challenge • Locked</div>
+                        </div>
+                        <div class="lesson-duration">6 min</div>
+                    </div>
+                </div>
+                <button class="start-button" disabled>Complete All Previous Modules</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learning Modal -->
+    <div class="learning-modal" id="learningModal">
+        <div class="learning-content">
+            <div class="learning-header">
+                <div>
+                    <h2 id="lessonTitle">Budget Challenge</h2>
+                    <div class="lesson-progress-indicator">
+                        <span>Progress:</span>
+                        <div class="progress-steps" id="progressSteps">
+                            <div class="progress-step active"></div>
+                            <div class="progress-step"></div>
+                            <div class="progress-step"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="close-btn" onclick="closeLearningModal()">&times;</button>
+            </div>
+            <div class="learning-body" id="lessonBody">
+                <!-- Content will be dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievement Popup -->
+    <div class="achievement-popup" id="achievementPopup">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 1.5rem;" id="achievementIcon">🏆</span>
+            <div>
+                <div style="font-weight: 600;" id="achievementTitle">Achievement Unlocked!</div>
+                <div style="font-size: 0.9rem; opacity: 0.9;" id="achievementText">Budget Master</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Learning state management
+        let currentStep = 0;
+        let currentLesson = '';
+        let userProgress = {
+            budgeting: { theory: true, practice: true, challenge: false },
+            saving: { theory: false, practice: false, challenge: false },
+            debt: { theory: false, practice: false, challenge: false },
+            investment: { theory: false, practice: false, challenge: false }
+        };
+
+        // Lesson content database with interactive flow
+        const lessons = {
+            'budget-challenge': {
+                title: 'Real-World Budget Challenge',
+                steps: 3,
+                content: [
+                    // Step 1: Quick Review
+                    {
+                        title: 'Quick Review: 50/30/20 Rule',
+                        content: `
+                            <div class="lesson-content">
+                                <h3>🎯 Let's Review Before Your Challenge</h3>
+                                <p>Before we dive into the real-world challenge, let's quickly review the 50/30/20 budgeting rule:</p>
+                                
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0;">
+                                    <div style="background: #e8f5e8; padding: 15px; border-radius: 10px; text-align: center;">
+                                        <div style="font-size: 2rem; margin-bottom: 5px;">🏠</div>
+                                        <div style="font-weight: 600; color: #2e7d32;">50% NEEDS</div>
+                                        <div style="font-size: 0.9rem; color: #555;">Rent, groceries, utilities</div>
+                                    </div>
+                                    <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; text-align: center;">
+                                        <div style="font-size: 2rem; margin-bottom: 5px;">🎮</div>
+                                        <div style="font-weight: 600; color: #1976d2;">30% WANTS</div>
+                                        <div style="font-size: 0.9rem; color: #555;">Entertainment, dining out</div>
+                                    </div>
+                                    <div style="background: #fff3e0; padding: 15px; border-radius: 10px; text-align: center;">
+                                        <div style="font-size: 2rem; margin-bottom: 5px;">💰</div>
+                                        <div style="font-weight: 600; color: #f57c00;">20% SAVINGS</div>
+                                        <div style="font-size: 0.9rem; color: #555;">Emergency fund, investments</div>
+                                    </div>
+                                </div>
+                                
+                                <p><strong>Your Challenge:</strong> You'll receive a realistic monthly income and expenses. Your goal is to create a balanced budget that follows the 50/30/20 rule while making smart financial decisions!</p>
+                            </div>
+                        `
+                    },
+                    // Step 2: Interactive Challenge
+                    {
+                        title: 'Your Budget Challenge',
+                        content: `
+                            <div class="lesson-content">
+                                <h3>💼 Scenario: New Graduate Budget</h3>
+                                <p>You just graduated and got your first job! Here's your situation:</p>
+                                <ul>
+                                    <li><strong>Monthly Income:</strong> ₹3,50,000 (after taxes)</li>
+                                    <li><strong>Fixed Expenses:</strong> Some are already set, others you can control</li>
+                                    <li><strong>Goal:</strong> Create a balanced budget following the 50/30/20 rule</li>
+                                </ul>
+                            </div>
+
+                            <div class="simulation-area">
+                                <div class="simulation-title">🎮 Interactive Budget Builder</div>
+                                
+                                <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                                    <strong>Monthly Income: ₹3,50,000</strong><br>
+                                    <small>Target: Needs ₹1,75,000 (50%) | Wants ₹1,05,000 (30%) | Savings ₹70,000 (20%)</small>
+                                </div>
+                                
+                                <div class="budget-simulator">
+                                    <div>
+                                        <h4 style="color: #2e7d32; margin-bottom: 15px;">🏠 NEEDS (Fixed + Variable)</h4>
+                                        <div class="input-group">
+                                            <label>Rent (Fixed)</label>
+                                            <input type="number" id="rent" value="90000" readonly style="background: #f5f5f5;">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Groceries</label>
+                                            <input type="number" id="groceries" placeholder="25000-50000" value="35000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Utilities & Phone</label>
+                                            <input type="number" id="utilities" placeholder="8000-15000" value="12000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Transportation</label>
+                                            <input type="number" id="transport" placeholder="15000-30000" value="25000">
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 style="color: #1976d2; margin-bottom: 15px;">🎮 WANTS</h4>
+                                        <div class="input-group">
+                                            <label>Entertainment & Streaming</label>
+                                            <input type="number" id="entertainment" placeholder="4000-25000" value="12000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Dining Out</label>
+                                            <input type="number" id="diningOut" placeholder="8000-30000" value="15000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Shopping & Hobbies</label>
+                                            <input type="number" id="shopping" placeholder="8000-40000" value="20000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Gym & Personal Care</label>
+                                            <input type="number" id="personal" placeholder="4000-15000" value="8000">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #fff3e0; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                                    <h4 style="color: #f57c00; margin: 0 0 10px 0;">💰 SAVINGS & DEBT</h4>
+                                    <div class="input-group">
+                                        <label>Emergency Fund Savings</label>
+                                        <input type="number" id="savings" placeholder="Target: ₹70,000" value="30000">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>Student Loan Payment</label>
+                                        <input type="number" id="studentLoan" value="20000" readonly style="background: #f5f5f5;">
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary" onclick="calculateChallengeBudget()" style="width: 100%; margin-bottom: 15px;">Analyze My Budget</button>
+                                
+                                <div class="results-area" id="challengeResults" style="display: none;">
+                                    <h4>📊 Your Budget Analysis</h4>
+                                    <div class="result-item">
+                                        <span>Total Needs:</span>
+                                        <span id="totalNeeds">$0</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>Total Wants:</span>
+                                        <span id="totalWants">$0</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>Total Savings:</span>
+                                        <span id="totalSavings">$0</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>Remaining Balance:</span>
+                                        <span id="remainingBalance">$0</span>
+                                    </div>
+                                    <div id="challengeFeedback" style="margin-top: 15px; padding: 15px; border-radius: 8px;"></div>
+                                </div>
+                            </div>
+                        `
+                    },
+                    // Step 3: Results & Next Steps
+                    {
+                        title: 'Challenge Complete!',
+                        content: `
+                            <div class="challenge-complete" id="challengeComplete" style="display: none;">
+                                <h4>🎉 Budget Challenge Mastered!</h4>
+                                <p>Congratulations! You've successfully created a balanced budget following the 50/30/20 rule.</p>
+                                <div class="xp-gained">
+                                    +150 XP Earned!
+                                </div>
+                            </div>
+                            
+                            <div class="lesson-content">
+                                <h3>🚀 What You've Learned</h3>
+                                <ul>
+                                    <li>How to apply the 50/30/20 rule to real-world scenarios</li>
+                                    <li>Making trade-offs between wants and needs</li>
+                                    <li>Prioritizing emergency fund savings</li>
+                                    <li>Balancing debt payments with other expenses</li>
+                                </ul>
+                                
+                                <h3>💡 Key Takeaways</h3>
+                                <p>The 50/30/20 rule is a guideline, not a strict law. The most important thing is:</p>
+                                <ul>
+                                    <li><strong>Live below your means</strong> - spend less than you earn</li>
+                                    <li><strong>Prioritize savings</strong> - pay yourself first</li>
+                                    <li><strong>Track your spending</strong> - awareness leads to better decisions</li>
+                                    <li><strong>Adjust as needed</strong> - your budget should evolve with your life</li>
+                                </ul>
+                                
+                                <div style="background: #e8f5e8; padding: 20px; border-radius: 15px; margin: 20px 0; text-align: center;">
+                                    <h4 style="color: #2e7d32; margin: 0 0 10px 0;">🎯 Ready for the Next Challenge?</h4>
+                                    <p style="margin: 0;">You've mastered budgeting! Time to learn about building your emergency fund and the power of compound interest.</p>
+                                </div>
+                            </div>
+                        `
+                    }
+                ]
+            },
+            'saving-theory': {
+                title: 'Emergency Fund Basics',
+                steps: 3,
+                content: [
+                    {
+                        title: 'Why Emergency Funds Matter',
+                        content: `
+                            <div class="lesson-content">
+                                <h3>🚨 Life Happens - Are You Ready?</h3>
+                                <p>Imagine this: Your car breaks down, you need a ₹60,000 repair, and payday is two weeks away. What do you do?</p>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                                    <div style="background: #ffebee; padding: 15px; border-radius: 10px; border-left: 4px solid #f44336;">
+                                        <h4 style="color: #c62828; margin-top: 0;">❌ Without Emergency Fund</h4>
+                                        <ul style="color: #555;">
+                                            <li>Put it on credit card (high interest)</li>
+                                            <li>Borrow from family/friends</li>
+                                            <li>Skip the repair (unsafe)</li>
+                                            <li>Stress and anxiety</li>
+                                        </ul>
+                                    </div>
+                                    <div style="background: #e8f5e8; padding: 15px; border-radius: 10px; border-left: 4px solid #4caf50;">
+                                        <h4 style="color: #2e7d32; margin-top: 0;">✅ With Emergency Fund</h4>
+                                        <ul style="color: #555;">
+                                            <li>Pay cash immediately</li>
+                                            <li>No debt or interest</li>
+                                            <li>Peace of mind</li>
+                                            <li>Rebuild fund over time</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <h3>🎯 The Emergency Fund Rule</h3>
+                                <p><strong>Goal:</strong> Save 3-6 months of essential expenses (not income!)</p>
+                                
+                                <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                                    <strong>Example:</strong> If your essential monthly expenses are ₹2,00,000:<br>
+                                    • Minimum emergency fund: ₹6,00,000 (3 months)<br>
+                                    • Ideal emergency fund: ₹12,00,000 (6 months)
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        title: 'Building Your Emergency Fund',
+                        content: `
+                            <div class="lesson-content">
+                                <h3>🏗️ Step-by-Step Building Strategy</h3>
+                                
+                                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0;">
+                                    <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; text-align: center;">
+                                        <div style="font-size: 1.5rem; margin-bottom: 5px;">1️⃣</div>
+                                        <div style="font-weight: 600; color: #1976d2;">Start Small</div>
+                                        <div style="font-size: 0.8rem; color: #555;">₹25,000 mini-emergency fund</div>
+                                    </div>
+                                    <div style="background: #f3e5f5; padding: 15px; border-radius: 10px; text-align: center;">
+                                        <div style="font-size: 1.5rem; margin-bottom: 5px;">2️⃣</div>
+                                        <div style="font-weight: 600; color: #7b1fa2;">Automate</div>
+                                        <div style="font-size: 0.8rem; color: #555;">Set up automatic transfers</div>
+                                    </div>
+                                    <div style="background: #fff3e0; padding: 15px; border-radius: 10px; text-align: center;">
+                                        <div style="font-size: 1.5rem; margin-bottom: 5px;">3️⃣</div>
+                                        <div style="font-weight: 600; color: #f57c00;">Separate Account</div>
+                                        <div style="font-size: 0.8rem; color: #555;">High-yield savings account</div>
+                                    </div>
+                                    <div style="background: #e8f5e8; padding: 15px; border-radius: 10px; text-align: center;">
+                                        <div style="font-size: 1.5rem; margin-bottom: 5px;">4️⃣</div>
+                                        <div style="font-weight: 600; color: #2e7d32;">Build Gradually</div>
+                                        <div style="font-size: 0.8rem; color: #555;">Reach 3-6 months</div>
+                                    </div>
+                                </div>
+                                
+                                <h3>💡 Smart Saving Tips</h3>
+                                <ul>
+                                    <li><strong>Pay yourself first:</strong> Save before spending on wants</li>
+                                    <li><strong>Use windfalls:</strong> Tax refunds, bonuses, gifts go to emergency fund</li>
+                                    <li><strong>Round up purchases:</strong> Save the spare change</li>
+                                    <li><strong>Reduce one expense:</strong> Cancel unused subscriptions</li>
+                                </ul>
+                                
+                                <div style="background: #fff8e1; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                                    <strong>💰 Where to Keep Your Emergency Fund:</strong><br>
+                                    • High-yield savings account (easy access + interest)<br>
+                                    • Money market account<br>
+                                    • NOT in checking (too tempting to spend)<br>
+                                    • NOT in investments (too risky for emergencies)
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        title: 'Emergency Fund Calculator',
+                        content: `
+                            <div class="lesson-content">
+                                <h3>🧮 Calculate Your Emergency Fund Goal</h3>
+                                <p>Let's figure out exactly how much you need to save for your emergency fund!</p>
+                            </div>
+
+                            <div class="simulation-area">
+                                <div class="simulation-title">💰 Emergency Fund Calculator</div>
+                                
+                                <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                                    <strong>Step 1:</strong> Calculate your essential monthly expenses (needs only, not wants)
+                                </div>
+                                
+                                <div class="budget-simulator">
+                                    <div>
+                                        <h4 style="color: #2e7d32; margin-bottom: 15px;">🏠 Essential Expenses Only</h4>
+                                        <div class="input-group">
+                                            <label>Rent/Mortgage</label>
+                                            <input type="number" id="emergencyRent" placeholder="80000" value="80000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Groceries (basic)</label>
+                                            <input type="number" id="emergencyGroceries" placeholder="20000" value="20000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Utilities</label>
+                                            <input type="number" id="emergencyUtilities" placeholder="8000" value="8000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Transportation</label>
+                                            <input type="number" id="emergencyTransport" placeholder="12000" value="12000">
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 style="color: #1976d2; margin-bottom: 15px;">💊 Other Essentials</h4>
+                                        <div class="input-group">
+                                            <label>Insurance Premiums</label>
+                                            <input type="number" id="emergencyInsurance" placeholder="10000" value="10000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Minimum Debt Payments</label>
+                                            <input type="number" id="emergencyDebt" placeholder="20000" value="20000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Phone</label>
+                                            <input type="number" id="emergencyPhone" placeholder="3000" value="3000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Other Essentials</label>
+                                            <input type="number" id="emergencyOther" placeholder="5000" value="5000">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary" onclick="calculateEmergencyFund()" style="width: 100%; margin-bottom: 15px;">Calculate My Emergency Fund Goal</button>
+                                
+                                <div class="results-area" id="emergencyResults" style="display: none;">
+                                    <h4>🎯 Your Emergency Fund Goals</h4>
+                                    <div class="result-item">
+                                        <span>Monthly Essential Expenses:</span>
+                                        <span id="monthlyEssentials">₹0</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>3-Month Emergency Fund:</span>
+                                        <span id="threeMonthFund" class="result-positive">₹0</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>6-Month Emergency Fund (Ideal):</span>
+                                        <span id="sixMonthFund" class="result-positive">₹0</span>
+                                    </div>
+                                    <div style="margin-top: 15px; padding: 15px; background: #e8f5e8; border-radius: 8px;">
+                                        <h4 style="color: #2e7d32; margin: 0 0 10px 0;">💡 Your Savings Plan</h4>
+                                        <div id="savingsPlan"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `
+                    }
+                ]
+            },
+            'saving-practice': {
+                title: 'Savings Growth Calculator',
+                steps: 3,
+                content: [
+                    {
+                        title: 'The Power of Compound Interest',
+                        content: `
+                            <div class="lesson-content">
+                                <h3>🚀 The Magic of Compound Interest</h3>
+                                <p>Albert Einstein allegedly called compound interest "the eighth wonder of the world." Let's see why!</p>
+                                
+                                <div style="background: #e8f5e8; padding: 20px; border-radius: 15px; margin: 20px 0;">
+                                    <h4 style="color: #2e7d32; margin: 0 0 15px 0;">💡 What is Compound Interest?</h4>
+                                    <p style="margin: 0;">Compound interest is when you earn interest not just on your original money, but also on the interest you've already earned. It's like earning money on your money!</p>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                                    <div style="background: #fff3e0; padding: 15px; border-radius: 10px;">
+                                        <h4 style="color: #f57c00; margin-top: 0;">📈 Simple Interest</h4>
+                                        <p>₹1,00,000 at 8% for 10 years:</p>
+                                        <p><strong>Final Amount: ₹1,80,000</strong></p>
+                                        <p style="font-size: 0.9rem; color: #666;">Interest earned: ₹80,000</p>
+                                    </div>
+                                    <div style="background: #e8f5e8; padding: 15px; border-radius: 10px;">
+                                        <h4 style="color: #2e7d32; margin-top: 0;">🚀 Compound Interest</h4>
+                                        <p>₹1,00,000 at 8% for 10 years:</p>
+                                        <p><strong>Final Amount: ₹2,15,892</strong></p>
+                                        <p style="font-size: 0.9rem; color: #666;">Interest earned: ₹1,15,892</p>
+                                    </div>
+                                </div>
+                                
+                                <h3>⏰ Time is Your Best Friend</h3>
+                                <p>The earlier you start, the more time compound interest has to work its magic:</p>
+                                
+                                <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                                    <strong>Example: Saving ₹10,000 per month at 12% annual return</strong><br>
+                                    • Start at 25, retire at 60: <strong>₹5.27 crores</strong><br>
+                                    • Start at 35, retire at 60: <strong>₹1.76 crores</strong><br>
+                                    • Start at 45, retire at 60: <strong>₹41.2 lakhs</strong>
+                                </div>
+                                
+                                <div style="background: #ffebee; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #f44336;">
+                                    <strong>⚠️ Key Lesson:</strong> Starting 10 years earlier can triple your retirement savings!
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        title: 'Interactive Savings Calculator',
+                        content: `
+                            <div class="lesson-content">
+                                <h3>🧮 See Your Money Grow</h3>
+                                <p>Use this calculator to see how your savings can grow over time with compound interest!</p>
+                            </div>
+
+                            <div class="simulation-area">
+                                <div class="simulation-title">💰 Savings Growth Calculator</div>
+                                
+                                <div class="budget-simulator">
+                                    <div>
+                                        <h4 style="color: #2e7d32; margin-bottom: 15px;">💵 Initial Investment</h4>
+                                        <div class="input-group">
+                                            <label>Starting Amount (₹)</label>
+                                            <input type="number" id="initialAmount" placeholder="50000" value="50000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Monthly Contribution (₹)</label>
+                                            <input type="number" id="monthlyContribution" placeholder="10000" value="10000">
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 style="color: #1976d2; margin-bottom: 15px;">📊 Investment Parameters</h4>
+                                        <div class="input-group">
+                                            <label>Annual Interest Rate (%)</label>
+                                            <input type="number" id="interestRate" placeholder="12" value="12" step="0.1">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Time Period (Years)</label>
+                                            <input type="number" id="timePeriod" placeholder="20" value="20">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary" onclick="calculateSavingsGrowth()" style="width: 100%; margin-bottom: 15px;">Calculate My Savings Growth</button>
+                                
+                                <div class="results-area" id="savingsResults" style="display: none;">
+                                    <h4>🎯 Your Savings Projection</h4>
+                                    <div class="result-item">
+                                        <span>Total Contributions:</span>
+                                        <span id="totalContributions">₹0</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>Interest Earned:</span>
+                                        <span id="interestEarned" class="result-positive">₹0</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>Final Amount:</span>
+                                        <span id="finalAmount" class="result-positive">₹0</span>
+                                    </div>
+                                    <div style="margin-top: 15px; padding: 15px; background: #e8f5e8; border-radius: 8px;">
+                                        <h4 style="color: #2e7d32; margin: 0 0 10px 0;">💡 Growth Breakdown</h4>
+                                        <div id="growthBreakdown"></div>
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #fff3e0; padding: 15px; border-radius: 10px; margin-top: 15px;">
+                                    <h4 style="color: #f57c00; margin: 0 0 10px 0;">🎯 Try Different Scenarios</h4>
+                                    <p style="margin: 0; font-size: 0.9rem;">Experiment with different amounts and time periods to see how small changes can make a big difference!</p>
+                                </div>
+                            </div>
+                        `
+                    },
+                    {
+                        title: 'Savings Strategy Challenge',
+                        content: `
+                            <div class="lesson-content">
+                                <h3>🏆 Your Savings Challenge</h3>
+                                <p>Now that you understand compound interest, let's create your personal savings strategy!</p>
+                                
+                                <div style="background: #e3f2fd; padding: 20px; border-radius: 15px; margin: 20px 0;">
+                                    <h4 style="color: #1976d2; margin: 0 0 15px 0;">🎯 Challenge: Build a 10-Year Savings Plan</h4>
+                                    <p>Create a savings plan that will help you reach ₹25 lakhs in 10 years using compound interest.</p>
+                                </div>
+                            </div>
+
+                            <div class="simulation-area">
+                                <div class="simulation-title">🎮 Savings Strategy Builder</div>
+                                
+                                <div style="background: #f0f8ff; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                                    <strong>Goal:</strong> Reach ₹25,00,000 in 10 years<br>
+                                    <strong>Your Task:</strong> Find the right combination of initial amount and monthly savings
+                                </div>
+                                
+                                <div class="budget-simulator">
+                                    <div>
+                                        <h4 style="color: #2e7d32; margin-bottom: 15px;">💰 Your Strategy</h4>
+                                        <div class="input-group">
+                                            <label>Initial Investment (₹)</label>
+                                            <input type="number" id="challengeInitial" placeholder="100000" value="100000">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Monthly Savings (₹)</label>
+                                            <input type="number" id="challengeMonthly" placeholder="15000" value="15000">
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h4 style="color: #1976d2; margin-bottom: 15px;">📈 Market Assumptions</h4>
+                                        <div class="input-group">
+                                            <label>Expected Annual Return (%)</label>
+                                            <input type="number" id="challengeRate" value="12" readonly style="background: #f5f5f5;">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Time Period (Years)</label>
+                                            <input type="number" id="challengeTime" value="10" readonly style="background: #f5f5f5;">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-primary" onclick="calculateSavingsChallenge()" style="width: 100%; margin-bottom: 15px;">Test My Strategy</button>
+                                
+                                <div class="results-area" id="challengeSavingsResults" style="display: none;">
+                                    <h4>📊 Strategy Results</h4>
+                                    <div class="result-item">
+                                        <span>Your Total Investment:</span>
+                                        <span id="challengeTotalInvested">₹0</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>Final Amount After 10 Years:</span>
+                                        <span id="challengeFinalAmount">₹0</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span>Goal Achievement:</span>
+                                        <span id="goalStatus">₹0</span>
+                                    </div>
+                                    <div id="challengeFeedback" style="margin-top: 15px; padding: 15px; border-radius: 8px;"></div>
+                                </div>
+                            </div>
+                        `
+                    }
+                ]
+            }
+        };
+
+        function openLesson(lessonId) {
+            const lesson = lessons[lessonId];
+            if (!lesson) return;
+
+            currentLesson = lessonId;
+            currentStep = 0;
+            
+            document.getElementById('lessonTitle').textContent = lesson.title;
+            updateProgressSteps(lesson.steps);
+            loadLessonStep();
+            
+            document.getElementById('learningModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateProgressSteps(totalSteps) {
+            const stepsContainer = document.getElementById('progressSteps');
+            stepsContainer.innerHTML = '';
+            
+            for (let i = 0; i < totalSteps; i++) {
+                const step = document.createElement('div');
+                step.className = `progress-step ${i === currentStep ? 'active' : ''}`;
+                stepsContainer.appendChild(step);
+            }
+        }
+
+        function loadLessonStep() {
+            const lesson = lessons[currentLesson];
+            const stepContent = lesson.content[currentStep];
+            
+            const actionButtons = currentStep === lesson.steps - 1 ? 
+                `<div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="closeLearningModal()">Close</button>
+                    <button class="btn btn-primary" onclick="completeLesson('${currentLesson}')">Complete Lesson</button>
+                </div>` :
+                `<div class="action-buttons">
+                    ${currentStep > 0 ? '<button class="btn btn-secondary" onclick="previousStep()">Previous</button>' : '<button class="btn btn-secondary" onclick="closeLearningModal()">Close</button>'}
+                    <button class="btn btn-next" onclick="nextStep()">Next Step</button>
+                </div>`;
+
+            document.getElementById('lessonBody').innerHTML = stepContent.content + actionButtons;
+            
+            // Update progress indicators
+            updateProgressSteps(lesson.steps);
+        }
+
+        function nextStep() {
+            const lesson = lessons[currentLesson];
+            if (currentStep < lesson.steps - 1) {
+                currentStep++;
+                loadLessonStep();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                loadLessonStep();
+            }
+        }
+
+        function closeLearningModal() {
+            document.getElementById('learningModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function completeLesson(lessonId) {
+            // Update progress based on lesson type
+            if (lessonId === 'budget-challenge') {
+                userProgress.budgeting.challenge = true;
+                showAchievement('🏆', 'Budget Master!', 'You\'ve mastered the 50/30/20 rule!');
+                updateStats(150, 1); // 150 XP, 1 lesson
+                unlockNextModule('saving');
+                
+                // Update the budgeting module UI to show completion
+                const budgetModule = document.getElementById('module-budgeting');
+                const challengeLesson = budgetModule.querySelector('.lesson-item.current');
+                if (challengeLesson) {
+                    challengeLesson.classList.remove('current');
+                    challengeLesson.classList.add('completed');
+                    challengeLesson.querySelector('.lesson-status').classList.remove('current');
+                    challengeLesson.querySelector('.lesson-status').classList.add('completed');
+                    challengeLesson.querySelector('.lesson-status').textContent = '✓';
+                    challengeLesson.querySelector('.lesson-type').textContent = '🏆 Challenge • Completed';
+                }
+                
+                // Update module progress
+                document.getElementById('budgetingProgress').style.width = '100%';
+                budgetModule.querySelector('.start-button').textContent = 'Module Complete!';
+                budgetModule.querySelector('.start-button').disabled = true;
+                
+            } else if (lessonId === 'saving-theory') {
+                userProgress.saving.theory = true;
+                showAchievement('📚', 'Emergency Fund Expert!', 'You understand the importance of emergency funds!');
+                updateStats(100, 1);
+                unlockNextLesson('saving', 'practice');
+                
+                // Update the saving module UI
+                const savingModule = document.getElementById('module-saving');
+                const theoryLesson = savingModule.querySelector('.lesson-item.current');
+                if (theoryLesson) {
+                    theoryLesson.classList.remove('current');
+                    theoryLesson.classList.add('completed');
+                    theoryLesson.querySelector('.lesson-status').classList.remove('current');
+                    theoryLesson.querySelector('.lesson-status').classList.add('completed');
+                    theoryLesson.querySelector('.lesson-status').textContent = '✓';
+                    theoryLesson.querySelector('.lesson-type').textContent = '📚 Theory • Completed';
+                }
+                
+                // Unlock next lesson
+                const nextLesson = theoryLesson.nextElementSibling;
+                if (nextLesson && nextLesson.classList.contains('locked')) {
+                    nextLesson.classList.remove('locked');
+                    nextLesson.classList.add('current');
+                    nextLesson.querySelector('.lesson-status').classList.remove('locked');
+                    nextLesson.querySelector('.lesson-status').classList.add('current');
+                    nextLesson.querySelector('.lesson-status').textContent = '▶';
+                    nextLesson.querySelector('.lesson-type').textContent = '🎮 Practice • Ready';
+                    nextLesson.onclick = function() { openLesson('saving-practice'); };
+                }
+                
+                // Update module progress
+                document.getElementById('module-saving').querySelector('.module-progress-fill').style.width = '33%';
+                savingModule.querySelector('.start-button').textContent = 'Continue Practice';
+                savingModule.querySelector('.start-button').onclick = function() { openLesson('saving-practice'); };
+                
+            } else if (lessonId === 'saving-practice') {
+                userProgress.saving.practice = true;
+                showAchievement('🎮', 'Compound Interest Master!', 'You understand the power of compound growth!');
+                updateStats(120, 1);
+                
+                // Update the saving module UI
+                const savingModule = document.getElementById('module-saving');
+                const practiceLesson = savingModule.querySelector('.lesson-item.current');
+                if (practiceLesson) {
+                    practiceLesson.classList.remove('current');
+                    practiceLesson.classList.add('completed');
+                    practiceLesson.querySelector('.lesson-status').classList.remove('current');
+                    practiceLesson.querySelector('.lesson-status').classList.add('completed');
+                    practiceLesson.querySelector('.lesson-status').textContent = '✓';
+                    practiceLesson.querySelector('.lesson-type').textContent = '🎮 Practice • Completed';
+                }
+                
+                // Unlock challenge lesson
+                const nextLesson = practiceLesson.nextElementSibling;
+                if (nextLesson && nextLesson.classList.contains('locked')) {
+                    nextLesson.classList.remove('locked');
+                    nextLesson.classList.add('current');
+                    nextLesson.querySelector('.lesson-status').classList.remove('locked');
+                    nextLesson.querySelector('.lesson-status').classList.add('current');
+                    nextLesson.querySelector('.lesson-status').textContent = '▶';
+                    nextLesson.querySelector('.lesson-type').textContent = '🏆 Challenge • Ready';
+                    nextLesson.onclick = function() { openLesson('saving-challenge'); };
+                }
+                
+                // Update module progress
+                document.getElementById('module-saving').querySelector('.module-progress-fill').style.width = '66%';
+                savingModule.querySelector('.start-button').textContent = 'Continue Challenge';
+                savingModule.querySelector('.start-button').onclick = function() { openLesson('saving-challenge'); };
+            }
+            
+            closeLearningModal();
+            updateUI();
+        }
+
+        function calculateChallengeBudget() {
+            const income = 350000;
+            const rent = parseFloat(document.getElementById('rent').value) || 0;
+            const groceries = parseFloat(document.getElementById('groceries').value) || 0;
+            const utilities = parseFloat(document.getElementById('utilities').value) || 0;
+            const transport = parseFloat(document.getElementById('transport').value) || 0;
+            const entertainment = parseFloat(document.getElementById('entertainment').value) || 0;
+            const diningOut = parseFloat(document.getElementById('diningOut').value) || 0;
+            const shopping = parseFloat(document.getElementById('shopping').value) || 0;
+            const personal = parseFloat(document.getElementById('personal').value) || 0;
+            const savings = parseFloat(document.getElementById('savings').value) || 0;
+            const studentLoan = parseFloat(document.getElementById('studentLoan').value) || 0;
+
+            const totalNeeds = rent + groceries + utilities + transport;
+            const totalWants = entertainment + diningOut + shopping + personal;
+            const totalSavings = savings + studentLoan;
+            const totalExpenses = totalNeeds + totalWants + totalSavings;
+            const balance = income - totalExpenses;
+
+            const needsPercentage = (totalNeeds / income) * 100;
+            const wantsPercentage = (totalWants / income) * 100;
+            const savingsPercentage = (totalSavings / income) * 100;
+
+            document.getElementById('totalNeeds').textContent = `₹${totalNeeds.toLocaleString('en-IN')} (${needsPercentage.toFixed(1)}%)`;
+            document.getElementById('totalWants').textContent = `₹${totalWants.toLocaleString('en-IN')} (${wantsPercentage.toFixed(1)}%)`;
+            document.getElementById('totalSavings').textContent = `₹${totalSavings.toLocaleString('en-IN')} (${savingsPercentage.toFixed(1)}%)`;
+            document.getElementById('remainingBalance').textContent = `₹${balance.toLocaleString('en-IN')}`;
+            document.getElementById('remainingBalance').className = balance >= 0 ? 'result-positive' : 'result-negative';
+
+            let feedback = '';
+            let feedbackClass = '';
+
+            if (needsPercentage <= 52 && wantsPercentage <= 32 && savingsPercentage >= 18 && balance >= 0) {
+                feedback = '🎉 Excellent! You\'ve created a balanced budget that follows the 50/30/20 rule. You\'re ready to move to the next level!';
+                feedbackClass = 'background: #e8f5e8; color: #2e7d32;';
+                document.getElementById('challengeComplete').style.display = 'block';
+                showAchievement('🏆', 'Budget Challenge Complete!', 'Perfect balance achieved!');
+                
+                // Auto-enable the complete lesson button
+                setTimeout(() => {
+                    const completeButton = document.querySelector('.btn-primary[onclick*="completeLesson"]');
+                    if (completeButton) {
+                        completeButton.style.background = 'linear-gradient(135deg, #4CAF50, #45a049)';
+                        completeButton.style.animation = 'pulse 2s infinite';
+                        completeButton.textContent = 'Complete Challenge & Unlock Next Module!';
+                    }
+                }, 1000);
+            } else {
+                feedback = '💡 Getting close! Try these adjustments:<br>';
+                if (needsPercentage > 52) feedback += `• Reduce needs by ₹${Math.ceil((needsPercentage - 50) * income / 100).toLocaleString('en-IN')}<br>`;
+                if (wantsPercentage > 32) feedback += `• Cut wants by ₹${Math.ceil((wantsPercentage - 30) * income / 100).toLocaleString('en-IN')}<br>`;
+                if (savingsPercentage < 18) feedback += `• Increase savings to reach 20%<br>`;
+                if (balance < 0) feedback += `• You\'re overspending by ₹${Math.abs(balance).toLocaleString('en-IN')}<br>`;
+                feedbackClass = 'background: #fff3e0; color: #ef6c00;';
+            }
+
+            document.getElementById('challengeFeedback').innerHTML = feedback;
+            document.getElementById('challengeFeedback').style.cssText = feedbackClass;
+            document.getElementById('challengeResults').style.display = 'block';
+        }
+
+        function calculateEmergencyFund() {
+            const rent = parseFloat(document.getElementById('emergencyRent').value) || 0;
+            const groceries = parseFloat(document.getElementById('emergencyGroceries').value) || 0;
+            const utilities = parseFloat(document.getElementById('emergencyUtilities').value) || 0;
+            const transport = parseFloat(document.getElementById('emergencyTransport').value) || 0;
+            const insurance = parseFloat(document.getElementById('emergencyInsurance').value) || 0;
+            const debt = parseFloat(document.getElementById('emergencyDebt').value) || 0;
+            const phone = parseFloat(document.getElementById('emergencyPhone').value) || 0;
+            const other = parseFloat(document.getElementById('emergencyOther').value) || 0;
+
+            const monthlyEssentials = rent + groceries + utilities + transport + insurance + debt + phone + other;
+            const threeMonth = monthlyEssentials * 3;
+            const sixMonth = monthlyEssentials * 6;
+
+            document.getElementById('monthlyEssentials').textContent = `₹${monthlyEssentials.toLocaleString('en-IN')}`;
+            document.getElementById('threeMonthFund').textContent = `₹${threeMonth.toLocaleString('en-IN')}`;
+            document.getElementById('sixMonthFund').textContent = `₹${sixMonth.toLocaleString('en-IN')}`;
+
+            const savingsNeeded = threeMonth;
+            const weeklySavings = Math.ceil(savingsNeeded / 52);
+            const monthlySavings = Math.ceil(savingsNeeded / 12);
+
+            document.getElementById('savingsPlan').innerHTML = `
+                To reach your 3-month emergency fund of <strong>₹${threeMonth.toLocaleString('en-IN')}</strong>:<br>
+                • Save <strong>₹${weeklySavings.toLocaleString('en-IN')}</strong> per week for 1 year<br>
+                • Save <strong>₹${monthlySavings.toLocaleString('en-IN')}</strong> per month for 1 year<br>
+                • Or use any windfalls (tax refunds, bonuses) to boost your progress!
+            `;
+
+            document.getElementById('emergencyResults').style.display = 'block';
+            
+            showAchievement('🧮', 'Calculator Master!', 'You know your emergency fund goal!');
+        }
+
+        function calculateSavingsGrowth() {
+            const initial = parseFloat(document.getElementById('initialAmount').value) || 0;
+            const monthly = parseFloat(document.getElementById('monthlyContribution').value) || 0;
+            const rate = parseFloat(document.getElementById('interestRate').value) / 100 || 0;
+            const years = parseFloat(document.getElementById('timePeriod').value) || 0;
+
+            const monthlyRate = rate / 12;
+            const totalMonths = years * 12;
+            const totalContributions = initial + (monthly * totalMonths);
+
+            // Future value of initial amount
+            const futureValueInitial = initial * Math.pow(1 + rate, years);
+            
+            // Future value of monthly contributions (annuity)
+            const futureValueMonthly = monthly * (Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate;
+            
+            const finalAmount = futureValueInitial + futureValueMonthly;
+            const interestEarned = finalAmount - totalContributions;
+
+            document.getElementById('totalContributions').textContent = `₹${totalContributions.toLocaleString('en-IN')}`;
+            document.getElementById('interestEarned').textContent = `₹${Math.round(interestEarned).toLocaleString('en-IN')}`;
+            document.getElementById('finalAmount').textContent = `₹${Math.round(finalAmount).toLocaleString('en-IN')}`;
+
+            const contributionPercentage = (totalContributions / finalAmount * 100).toFixed(1);
+            const interestPercentage = (interestEarned / finalAmount * 100).toFixed(1);
+
+            document.getElementById('growthBreakdown').innerHTML = `
+                Your contributions: <strong>${contributionPercentage}%</strong> (₹${totalContributions.toLocaleString('en-IN')})<br>
+                Compound interest: <strong>${interestPercentage}%</strong> (₹${Math.round(interestEarned).toLocaleString('en-IN')})<br><br>
+                <strong>💡 Key Insight:</strong> ${interestPercentage > 50 ? 'Compound interest is doing most of the work!' : 'Consider increasing your time horizon or contribution amount to let compound interest work harder for you.'}
+            `;
+
+            document.getElementById('savingsResults').style.display = 'block';
+            
+            showAchievement('📈', 'Growth Calculator!', 'You understand compound interest power!');
+        }
+
+        function calculateSavingsChallenge() {
+            const initial = parseFloat(document.getElementById('challengeInitial').value) || 0;
+            const monthly = parseFloat(document.getElementById('challengeMonthly').value) || 0;
+            const rate = 0.12; // 12% fixed
+            const years = 10; // 10 years fixed
+            const goal = 2500000; // ₹25 lakhs
+
+            const monthlyRate = rate / 12;
+            const totalMonths = years * 12;
+            const totalInvested = initial + (monthly * totalMonths);
+
+            // Future value calculation
+            const futureValueInitial = initial * Math.pow(1 + rate, years);
+            const futureValueMonthly = monthly * (Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate;
+            const finalAmount = futureValueInitial + futureValueMonthly;
+
+            document.getElementById('challengeTotalInvested').textContent = `₹${totalInvested.toLocaleString('en-IN')}`;
+            document.getElementById('challengeFinalAmount').textContent = `₹${Math.round(finalAmount).toLocaleString('en-IN')}`;
+
+            let feedback = '';
+            let feedbackClass = '';
+            let goalStatusText = '';
+
+            if (finalAmount >= goal) {
+                const excess = finalAmount - goal;
+                goalStatusText = `🎉 Goal Achieved! (₹${Math.round(excess).toLocaleString('en-IN')} extra)`;
+                feedback = `🏆 Excellent! Your strategy will reach ₹${Math.round(finalAmount).toLocaleString('en-IN')}, which exceeds your goal by ₹${Math.round(excess).toLocaleString('en-IN')}. You're on track for financial success!`;
+                feedbackClass = 'background: #e8f5e8; color: #2e7d32;';
+                
+                showAchievement('🏆', 'Savings Master!', 'You\'ve created a winning strategy!');
+            } else {
+                const shortfall = goal - finalAmount;
+                const additionalMonthlyNeeded = shortfall / ((Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate);
+                goalStatusText = `❌ Short by ₹${Math.round(shortfall).toLocaleString('en-IN')}`;
+                feedback = `💡 You're close! To reach your ₹25 lakh goal, you need to save an additional ₹${Math.round(additionalMonthlyNeeded).toLocaleString('en-IN')} per month, or increase your initial investment.`;
+                feedbackClass = 'background: #fff3e0; color: #ef6c00;';
+            }
+
+            document.getElementById('goalStatus').textContent = goalStatusText;
+            document.getElementById('challengeFeedback').innerHTML = feedback;
+            document.getElementById('challengeFeedback').style.cssText = feedbackClass;
+            document.getElementById('challengeSavingsResults').style.display = 'block';
+        }
+
+        function showAchievement(icon, title, description) {
+            document.getElementById('achievementIcon').textContent = icon;
+            document.getElementById('achievementTitle').textContent = title;
+            document.getElementById('achievementText').textContent = description;
+            
+            const popup = document.getElementById('achievementPopup');
+            popup.classList.add('show');
+            
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 4000);
+        }
+
+        function updateStats(xpGain, lessonGain) {
+            const currentXP = parseInt(document.getElementById('xpPoints').textContent);
+            const currentLessons = parseInt(document.getElementById('lessonsCompleted').textContent);
+            const currentStreak = parseInt(document.getElementById('streakDays').textContent);
+            
+            document.getElementById('xpPoints').textContent = currentXP + xpGain;
+            document.getElementById('lessonsCompleted').textContent = currentLessons + lessonGain;
+            document.getElementById('streakDays').textContent = currentStreak + 1;
+            
+            // Update overall progress
+            const newProgress = Math.min(((currentLessons + lessonGain) / 12) * 100, 100);
+            document.getElementById('overallProgress').style.width = newProgress + '%';
+        }
+
+        function unlockNextModule(moduleId) {
+            const moduleCard = document.getElementById(`module-${moduleId}`);
+            if (moduleCard) {
+                moduleCard.classList.remove('locked');
+                const button = moduleCard.querySelector('.start-button');
+                button.disabled = false;
+                button.textContent = 'Start Learning';
+            }
+        }
+
+        function unlockNextLesson(moduleId, lessonType) {
+            // This would update the UI to show the next lesson as available
+            // Implementation depends on your specific lesson structure
+        }
+
+        function updateUI() {
+            // Update module progress bars and lesson states based on userProgress
+            // This would be more complex in a real application
+        }
+
+        // Auto-calculate when inputs change
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for real-time calculation updates
+            const challengeInputs = ['groceries', 'utilities', 'transport', 'entertainment', 'diningOut', 'shopping', 'personal', 'savings'];
+            challengeInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', function() {
+                        if (document.getElementById('challengeResults').style.display === 'block') {
+                            calculateChallengeBudget();
+                        }
+                    });
+                }
+            });
+
+            const emergencyInputs = ['emergencyRent', 'emergencyGroceries', 'emergencyUtilities', 'emergencyTransport', 'emergencyInsurance', 'emergencyDebt', 'emergencyPhone', 'emergencyOther'];
+            emergencyInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', function() {
+                        if (document.getElementById('emergencyResults').style.display === 'block') {
+                            calculateEmergencyFund();
+                        }
+                    });
+                }
+            });
+
+            // Add listeners for savings calculator
+            const savingsInputs = ['initialAmount', 'monthlyContribution', 'interestRate', 'timePeriod'];
+            savingsInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', function() {
+                        if (document.getElementById('savingsResults').style.display === 'block') {
+                            calculateSavingsGrowth();
+                        }
+                    });
+                }
+            });
+
+            // Add listeners for savings challenge
+            const challengeInputs = ['challengeInitial', 'challengeMonthly'];
+            challengeInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', function() {
+                        if (document.getElementById('challengeSavingsResults').style.display === 'block') {
+                            calculateSavingsChallenge();
+                        }
+                    });
+                }
+            });
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('learningModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLearningModal();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'989502ad84894463',t:'MTc1OTU4NDM4MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
