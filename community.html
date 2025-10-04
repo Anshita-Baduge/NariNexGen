@@ -1,1 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTech Community Hub</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .main-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .community-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .community-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .community-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+        }
+
+        .community-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-right: 1rem;
+        }
+
+        .social-money .card-icon {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+        }
+
+        .mental-health .card-icon {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+
+        .fraud-detection .card-icon {
+            background: linear-gradient(135deg, #45b7d1, #2d5aa0);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .card-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-list li i {
+            color: #4ecdc4;
+            margin-right: 0.5rem;
+            width: 20px;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px 20px 0 0;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 1.5rem;
+            top: 1.5rem;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .close:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-box {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .feature-box h4 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .tool-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .community-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="hero-section">
+            <h1><i class="fas fa-users"></i> FinTech Community Hub</h1>
+            <p>Empowering financial wellness through community-driven savings, mental health support, and fraud protection</p>
+        </div>
+
+        <div class="community-grid">
+            <!-- Social Money Circles Card -->
+            <div class="community-card social-money" onclick="openModal('socialModal')">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <div class="card-title">Social Money Circles</div>
+                </div>
+                <div class="card-description">
+                    Join peer savings challenges, family matching programs, and college competitions to build healthy financial habits together.
+                </div>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> Peer Savings Challenges</li>
+                    <li><i class="fas fa-check-circle"></i> Family Matching Programs</li>
+                    <li><i class="fas fa-check-circle"></i> College Club Competitions</li>
+                    <li><i class="fas fa-check-circle"></i> Group Progress Tracking</li>
+                </ul>
+                <button class="cta-button">
+                    <i class="fas fa-arrow-right"></i> Explore Social Circles
+                </button>
+            </div>
+
+            <!-- Mental Health Integration Card -->
+            <div class="community-card mental-health" onclick="openModal('mentalModal')">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="card-title">Mental Health Integration</div>
+                </div>
+                <div class="card-description">
+                    Connect your emotional well-being with financial health through stress monitoring, mindful spending, and balanced lifestyle support.
+                </div>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> Stress Check-ins</li>
+                    <li><i class="fas fa-check-circle"></i> Mindful Spending Tips</li>
+                    <li><i class="fas fa-check-circle"></i> Balance Encouragement</li>
+                    <li><i class="fas fa-check-circle"></i> AI Pattern Detection</li>
+                </ul>
+                <button class="cta-button">
+                    <i class="fas fa-arrow-right"></i> Start Wellness Journey
+                </button>
+            </div>
+
+            <!-- Investment Fraud Detection Card -->
+            <div class="community-card fraud-detection" onclick="openModal('fraudModal')">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="card-title">Investment Fraud Detection</div>
+                </div>
+                <div class="card-description">
+                    Protect your investments with advanced fraud detection, community alerts, and educational resources to identify and avoid scams.
+                </div>
+                <ul class="feature-list">
+                    <li><i class="fas fa-check-circle"></i> Real-time Scam Detection</li>
+                    <li><i class="fas fa-check-circle"></i> Community Alert System</li>
+                    <li><i class="fas fa-check-circle"></i> Educational Resources</li>
+                    <li><i class="fas fa-check-circle"></i> Investment Verification</li>
+                </ul>
+                <button class="cta-button">
+                    <i class="fas fa-arrow-right"></i> Secure Your Investments
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Money Circles Modal -->
+    <div id="socialModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('socialModal')">&times;</span>
+                <h2><i class="fas fa-handshake"></i> Social Money Circles</h2>
+                <p>Build wealth together through community-driven financial challenges</p>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Active Members</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">₹2.5Cr</div>
+                        <div class="stat-label">Total Savings</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Active Circles</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">85%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <h4><i class="fas fa-users"></i> Peer Savings Challenges</h4>
+                        <p>Join groups of 3-10 friends for structured savings goals. Track daily progress, celebrate milestones, and achieve financial targets together.</p>
+                        <ul>
+                            <li>• Daily savings tracking (₹50-₹500)</li>
+                            <li>• Group accountability systems</li>
+                            <li>• Milestone celebrations</li>
+                            <li>• Penalty and reward systems</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <h4><i class="fas fa-home"></i> Family Matching Programs</h4>
+                        <p>Parents and guardians can match children's savings to encourage financial responsibility and goal achievement.</p>
+                        <ul>
+                            <li>• 1:1 or custom matching ratios</li>
+                            <li>• Educational financial content</li>
+                            <li>• Goal-based rewards system</li>
+                            <li>• Progress visualization</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <h4><i class="fas fa-graduation-cap"></i> College Club Competitions</h4>
+                        <p>Campus-wide financial challenges with leaderboards, badges, and prizes for the best savers and financial planners.</p>
+                        <ul>
+                            <li>• Inter-college competitions</li>
+                            <li>• Gamified leaderboards</li>
+                            <li>• Financial literacy workshops</li>
+                            <li>• Scholarship opportunities</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <h4><i class="fas fa-chart-line"></i> Group Progress Tracking</h4>
+                        <p>Advanced analytics and visualization tools to monitor group performance and individual contributions.</p>
+                        <ul>
+                            <li>• Real-time dashboards</li>
+                            <li>• Individual vs group metrics</li>
+                            <li>• Achievement badges</li>
+                            <li>• Social sharing features</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tool-section">
+                    <h3><i class="fas fa-tools"></i> Available Tools & Features</h3>
+                    <div class="feature-grid">
+                        <div>
+                            <h4>Simple Group Wallets</h4>
+                            <p>Secure, shared digital wallets for group savings with transparent transaction history and automated rule enforcement.</p>
+                        </div>
+                        <div>
+                            <h4>Shared Progress Dashboards</h4>
+                            <p>Real-time visualization of group and individual progress with customizable goals and milestone tracking.</p>
+                        </div>
+                        <div>
+                            <h4>Social Features</h4>
+                            <p>In-app messaging, progress sharing, celebration tools, and peer motivation systems.</p>
+                        </div>
+                        <div>
+                            <h4>Smart Notifications</h4>
+                            <p>Automated reminders, milestone alerts, and motivational messages to keep everyone engaged.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mental Health Integration Modal -->
+    <div id="mentalModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('mentalModal')">&times;</span>
+                <h2><i class="fas fa-brain"></i> Emotional & Mental Health Integration</h2>
+                <p>Connect your mental well-being with financial health for holistic prosperity</p>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number">8.5K+</div>
+                        <div class="stat-label">Users Supported</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">92%</div>
+                        <div class="stat-label">Stress Reduction</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">78%</div>
+                        <div class="stat-label">Better Spending</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">4.8/5</div>
+                        <div class="stat-label">User Rating</div>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <h4><i class="fas fa-heart-pulse"></i> Stress Check-ins</h4>
+                        <p>Regular emotional wellness assessments to understand your financial anxiety levels and provide targeted support.</p>
+                        <ul>
+                            <li>• Weekly stress level monitoring</li>
+                            <li>• Financial anxiety tracking</li>
+                            <li>• Mood correlation analysis</li>
+                            <li>• Personalized coping strategies</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <h4><i class="fas fa-lightbulb"></i> Mindful Spending Tips</h4>
+                        <p>AI-powered insights that connect emotional triggers to spending patterns, helping you make conscious financial decisions.</p>
+                        <ul>
+                            <li>• Emotional spending pattern detection</li>
+                            <li>• Trigger identification and alerts</li>
+                            <li>• Mindful spending exercises</li>
+                            <li>• Alternative coping suggestions</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <h4><i class="fas fa-balance-scale"></i> Encourage Balance</h4>
+                        <p>Smart nudges that promote both saving and self-care spending to maintain a healthy financial and emotional balance.</p>
+                        <ul>
+                            <li>• Self-care spending reminders</li>
+                            <li>• Balanced budget suggestions</li>
+                            <li>• Wellness goal integration</li>
+                            <li>• Reward system for balance</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <h4><i class="fas fa-robot"></i> AI Pattern Detection</h4>
+                        <p>Advanced machine learning algorithms that identify subtle patterns between your emotional state and financial behavior.</p>
+                        <ul>
+                            <li>• Behavioral pattern analysis</li>
+                            <li>• Predictive stress modeling</li>
+                            <li>• Personalized intervention timing</li>
+                            <li>• Long-term trend analysis</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tool-section">
+                    <h3><i class="fas fa-tools"></i> Mental Health Tools & Resources</h3>
+                    <div class="feature-grid">
+                        <div>
+                            <h4>Simple Survey System</h4>
+                            <p>Quick, scientifically-backed questionnaires to assess financial stress, anxiety levels, and emotional well-being.</p>
+                        </div>
+                        <div>
+                            <h4>AI Pattern Detection</h4>
+                            <p>Advanced algorithms that analyze survey responses and spending data to identify mental health patterns and triggers.</p>
+                        </div>
+                        <div>
+                            <h4>Mindfulness Integration</h4>
+                            <p>Guided meditation, breathing exercises, and mindfulness practices specifically designed for financial wellness.</p>
+                        </div>
+                        <div>
+                            <h4>Professional Support</h4>
+                            <p>Access to certified financial therapists and counselors for personalized mental health and financial guidance.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 2rem; border-radius: 15px; margin-top: 2rem;">
+                    <h3><i class="fas fa-heartbeat"></i> Wellness Integration Features</h3>
+                    <ul style="columns: 2; gap: 2rem; margin-top: 1rem;">
+                        <li style="margin-bottom: 0.5rem;">• Mood-based spending recommendations</li>
+                        <li style="margin-bottom: 0.5rem;">• Stress-reduction financial goals</li>
+                        <li style="margin-bottom: 0.5rem;">• Emotional spending intervention</li>
+                        <li style="margin-bottom: 0.5rem;">• Self-care budget allocation</li>
+                        <li style="margin-bottom: 0.5rem;">• Mental health emergency fund</li>
+                        <li style="margin-bottom: 0.5rem;">• Therapy and wellness expenses tracking</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Investment Fraud Detection Modal -->
+    <div id="fraudModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal('fraudModal')">&times;</span>
+                <h2><i class="fas fa-shield-alt"></i> Investment Fraud Detection</h2>
+                <p>Advanced protection against financial scams and fraudulent investment schemes</p>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number">₹45Cr</div>
+                        <div class="stat-label">Fraud Prevented</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">12K+</div>
+                        <div class="stat-label">Scams Detected</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">98.7%</div>
+                        <div class="stat-label">Detection Rate</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Protected Users</div>
+                    </div>
+                </div>
+
+                <div class="feature-grid">
+                    <div class="feature-box">
+                        <h4><i class="fas fa-search"></i> Real-time Scam Detection</h4>
+                        <p>Advanced AI algorithms continuously monitor investment opportunities and flag potential fraudulent schemes.</p>
+                        <ul>
+                            <li>• ML-powered fraud identification</li>
+                            <li>• Ponzi scheme detection</li>
+                            <li>• Fake investment platform alerts</li>
+                            <li>• Social media scam monitoring</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Community Alert System</h4>
+                        <p>Crowdsourced fraud reporting where community members can report and verify suspicious investment opportunities.</p>
+                        <ul>
+                            <li>• User-generated scam reports</li>
+                            <li>• Verified fraud database</li>
+                            <li>• Real-time community warnings</li>
+                            <li>• Reputation scoring system</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <h4><i class="fas fa-graduation-cap"></i> Educational Resources</h4>
+                        <p>Comprehensive fraud awareness training, case studies, and prevention guides to educate users about investment risks.</p>
+                        <ul>
+                            <li>• Interactive fraud training modules</li>
+                            <li>• Real case study analysis</li>
+                            <li>• Red flag identification guides</li>
+                            <li>• Regular awareness campaigns</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="feature-box">
+                        <h4><i class="fas fa-verify"></i> Investment Verification</h4>
+                        <p>Due diligence tools to verify the legitimacy of investment platforms, advisors, and financial products.</p>
+                        <ul>
+                            <li>• Platform license verification</li>
+                            <li>• Advisor credential checking</li>
+                            <li>• Company background analysis</li>
+                            <li>• Regulatory compliance tracking</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="tool-section">
+                    <h3><i class="fas fa-tools"></i> Fraud Protection Arsenal</h3>
+                    <div class="feature-grid">
+                        <div>
+                            <h4>AI Fraud Engine</h4>
+                            <p>Machine learning models trained on thousands of fraud patterns to identify new and emerging scam tactics.</p>
+                        </div>
+                        <div>
+                            <h4>Blockchain Verification</h4>
+                            <p>Immutable fraud reporting system using blockchain technology for transparent and tamper-proof scam databases.</p>
+                        </div>
+                        <div>
+                            <h4>Regulatory Integration</h4>
+                            <p>Direct integration with SEBI, RBI, and other regulatory databases for real-time compliance verification.</p>
+                        </div>
+                        <div>
+                            <h4>Risk Assessment</h4>
+                            <p>Comprehensive risk scoring for investments based on multiple factors including historical data and market analysis.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 2rem; border-radius: 15px; margin-top: 2rem;">
+                    <h3><i class="fas fa-warning"></i> Common Fraud Types We Detect</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <div>
+                            <h4>🎯 Ponzi Schemes</h4>
+                            <p>High-return promises using new investor money</p>
+                        </div>
+                        <div>
+                            <h4>💎 Fake Crypto Projects</h4>
+                            <p>Fraudulent cryptocurrency and DeFi schemes</p>
+                        </div>
+                        <div>
+                            <h4>📈 Pump & Dump</h4>
+                            <p>Artificial stock price manipulation schemes</p>
+                        </div>
+                        <div>
+                            <h4>🏦 Fake Platforms</h4>
+                            <p>Counterfeit trading and investment platforms</p>
+                        </div>
+                        <div>
+                            <h4>📞 Cold Call Scams</h4>
+                            <p>Unsolicited investment opportunity calls</p>
+                        </div>
+                        <div>
+                            <h4>💳 Identity Theft</h4>
+                            <p>Financial identity theft for fraudulent investments</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #d4edda; padding: 2rem; border-radius: 15px; margin-top: 2rem;">
+                    <h3><i class="fas fa-shield-check"></i> Protection Guarantee</h3>
+                    <p style="margin-bottom: 1rem; font-size: 1.1rem;">Our fraud detection system comes with a protection guarantee:</p>
+                    <ul style="columns: 2; gap: 2rem;">
+                        <li>• 24/7 monitoring and alerts</li>
+                        <li>• Insurance coverage for verified fraud</li>
+                        <li>• Instant fund freezing capabilities</li>
+                        <li>• Legal assistance for fraud victims</li>
+                        <li>• Recovery assistance programs</li>
+                        <li>• Emergency financial counseling</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modals = ['socialModal', 'mentalModal', 'fraudModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    closeModal(modalId);
+                }
+            });
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modals = ['socialModal', 'mentalModal', 'fraudModal'];
+                modals.forEach(modalId => {
+                    const modal = document.getElementById(modalId);
+                    if (modal.style.display === 'block') {
+                        closeModal(modalId);
+                    }
+                });
+            }
+        });
+
+        // Add smooth scrolling and animation effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate cards on page load
+            const cards = document.querySelectorAll('.community-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+
+            // Add hover sound effect (optional - requires audio files)
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+
+        // Add dynamic statistics animation
+        function animateStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const finalValue = stat.textContent;
+                const numericValue = parseInt(finalValue.replace(/[^\d]/g, ''));
+                if (numericValue) {
+                    let currentValue = 0;
+                    const increment = numericValue / 50;
+                    const timer = setInterval(() => {
+                        currentValue += increment;
+                        if (currentValue >= numericValue) {
+                            currentValue = numericValue;
+                            clearInterval(timer);
+                        }
+                        stat.textContent = finalValue.replace(numericValue.toString(), Math.floor(currentValue).toString());
+                    }, 20);
+                }
+            });
+        }
+
+        // Trigger stats animation when modal opens
+        const originalOpenModal = openModal;
+        openModal = function(modalId) {
+            originalOpenModal(modalId);
+            setTimeout(animateStats, 300);
+        };
+    </script>
+</body>
+</html>
